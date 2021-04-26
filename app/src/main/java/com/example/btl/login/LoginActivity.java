@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.btl.MainActivity;
 import com.example.btl.R;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
@@ -41,17 +42,13 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
 
-
         auth = FirebaseAuth.getInstance();
-
-
         btnGG = findViewById(R.id.btnGG);
         btnGG.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,9 +69,6 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 GoogleSignInAccount inAccount = accountTask.getResult(ApiException.class);
                 if (inAccount != null) {
-                    if (inAccount.getPhotoUrl() != null) {
-                        Toast.makeText(this, "Đã lấy đc ảnh", Toast.LENGTH_SHORT).show();
-                    }
                     firebaseAuth(inAccount);
                 }
 
@@ -91,8 +85,8 @@ public class LoginActivity extends AppCompatActivity {
         auth.signInWithCredential(credential).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
             @Override
             public void onSuccess(AuthResult authResult) {
-                FirebaseUser user = auth.getCurrentUser();
-                Toast.makeText(LoginActivity.this, "Đã login thành công!", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                finish();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

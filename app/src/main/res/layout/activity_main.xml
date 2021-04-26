@@ -25,6 +25,16 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/mAvatar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            app:civ_border_color="@color/white"
+            app:civ_border_overlay="true"
+            app:civ_border_width="1dp"
+            app:civ_circle_background_color="@color/white" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
