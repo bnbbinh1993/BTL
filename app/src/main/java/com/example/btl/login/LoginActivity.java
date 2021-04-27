@@ -4,7 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -27,6 +29,14 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
     private MaterialButton btnGG;
@@ -85,8 +95,8 @@ public class LoginActivity extends AppCompatActivity {
         auth.signInWithCredential(credential).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
             @Override
             public void onSuccess(AuthResult authResult) {
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                finish();
+                UpdateData(inAccount);
+
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -95,9 +105,87 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
-    private void ClearData(){
+
+    private void UpdateData(GoogleSignInAccount inAccount) {
+
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Uploading");
+        progressDialog.show();
+        FirebaseUser user = auth.getCurrentUser();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+
+        Map<String, String> map = new HashMap<>();
+
+        map.put("personName", inAccount.getDisplayName());
+        map.put("personGivenName", inAccount.getGivenName());
+        map.put("personFamilyName", inAccount.getFamilyName());
+        map.put("personEmail", inAccount.getEmail());
+        map.put("personId", inAccount.getId());
+
+
+        reference.child("User").child(user.getUid()).setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(LoginActivity.this, "onSuccess!", Toast.LENGTH_SHORT).show();
+                progressDialog.setCanceledOnTouchOutside(false);
+                progressDialog.dismiss();
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                finish();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(LoginActivity.this, "onFailure!", Toast.LENGTH_SHORT).show();
+                progressDialog.setCanceledOnTouchOutside(false);
+                progressDialog.dismiss();
+            }
+        });
+
 
     }
 
+    private void test() {
 
-}
+//        if (inAccount.getPhotoUrl() != null) {
+//            StorageReference storageReference = FirebaseStorage.getInstance().getReference("Upload Photos").child(System.currentTimeMillis() +
+//                    "." + inAccount.getPhotoUrl());
+//            storageReference.putFile(inAccount.getPhotoUrl())
+//                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                        @Override
+//                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//
+//                            Map<String, String> map = new HashMap<>();
+//
+//                            map.put("personName", inAccount.getDisplayName());
+//                            map.put("personGivenName", inAccount.getGivenName());
+//                            map.put("personFamilyName", inAccount.getFamilyName());
+//                            map.put("personEmail", inAccount.getEmail());
+//                            map.put("personId", inAccount.getId());
+//                            map.put("URL", taskSnapshot.getMetadata().getReference().getDownloadUrl().toString());
+//
+//                            reference.child("User").child(user.toString()).setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                @Override
+//                                public void onSuccess(Void aVoid) {
+//                                    Toast.makeText(LoginActivity.this, "onSuccess!", Toast.LENGTH_SHORT).show();
+//                                    progressDialog.setCanceledOnTouchOutside(false);
+//                                    progressDialog.dismiss();
+//                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+//                                    finish();
+//                                }
+//                            }).addOnFailureListener(new OnFailureListener() {
+//                                @Override
+//                                public void onFailure(@NonNull Exception e) {
+//                                    Toast.makeText(LoginActivity.this, "onFailure!", Toast.LENGTH_SHORT).show();
+//                                    progressDialog.setCanceledOnTouchOutside(false);
+//                                    progressDialog.dismiss();
+//                                }
+//                            });
+//
+//
+//                        }
+//                    });
+
+        }
+    }
+
+
