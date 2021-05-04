@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".CreateRoomActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                style="@style/TXT"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Room name"
+                tools:ignore="HardcodedText" />
+
+            <EditText
+                android:id="@+id/nameRoom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:hint="Test 1"
+                android:imeOptions="actionSearch"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                tools:ignore="HardcodedText" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                style="@style/TXT"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Room password"
+                tools:ignore="HardcodedText" />
+
+            <EditText
+                android:id="@+id/passwordRoom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:hint="***"
+                android:imeOptions="actionSearch"
+                android:inputType="number"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                tools:ignore="HardcodedText,TextFields" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                style="@style/TXT"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Subject ID"
+                tools:ignore="HardcodedText" />
+
+            <EditText
+                android:id="@+id/topicId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:hint="(VD: 1000)"
+                android:imeOptions="actionSearch"
+                android:inputType="number"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                tools:ignore="HardcodedText" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                style="@style/TXT"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Test time(s/question)"
+                tools:ignore="HardcodedText" />
+
+            <EditText
+                android:id="@+id/timeTest"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:hint="15"
+                android:imeOptions="actionSearch"
+                android:inputType="number"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                tools:ignore="HardcodedText" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCreate"
+            android:text="Create"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="HardcodedText" />
+    </LinearLayout>
+
+
+</LinearLayout>

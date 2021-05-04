@@ -72,7 +72,7 @@
         android:weightSum="2.5">
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/btnCreate"
+            android:id="@+id/btnTopic"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -87,7 +87,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
+                    android:layout_height="95dp"
                     android:layout_gravity="center"
                     android:background="@drawable/bg_3">
 
@@ -103,7 +103,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="10dp"
-                    android:text="Create room"
+                    android:text="Topic"
                     android:textAlignment="center"
                     android:textColor="@color/app"
                     android:textSize="14sp" />
@@ -112,6 +112,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnRoom"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -142,7 +143,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="10dp"
-                    android:text="Join"
+                    android:text="Room"
                     android:textAlignment="center"
                     android:textColor="@color/app"
                     android:textSize="14sp" />

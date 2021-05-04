@@ -11,7 +11,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BTL"
         android:usesCleartextTraffic="true">
-        <activity android:name=".JoinActivity"></activity>
+        <activity android:name=".TopicActivity"></activity>
+        <activity android:name=".CreateRoomActivity" />
+        <activity android:name=".JoinActivity" />
         <activity
             android:name=".CreateQuestionActivity"
             android:screenOrientation="portrait"

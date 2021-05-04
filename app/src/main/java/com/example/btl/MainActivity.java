@@ -26,7 +26,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity {
-    private MaterialCardView btnCreate;
+    private MaterialCardView btnTopic;
+    private MaterialCardView btnRoom;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth auth;
     private GoogleSignInAccount acct;
@@ -39,15 +40,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         initGG();
         init();
         getPersonByGG();
 
-        btnCreate.setOnClickListener(new View.OnClickListener() {
+        btnTopic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, CreateQuestionActivity.class));
+                startActivity(new Intent(MainActivity.this, TopicActivity.class));
             }
         });
         mAvatar.setOnClickListener(new View.OnClickListener() {
@@ -61,7 +61,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void init() {
-        btnCreate = findViewById(R.id.btnCreate);
+        btnTopic = findViewById(R.id.btnTopic);
+        btnRoom = findViewById(R.id.btnRoom);
         txtName = findViewById(R.id.txtName);
         mAvatar = findViewById(R.id.mAvatar);
 
