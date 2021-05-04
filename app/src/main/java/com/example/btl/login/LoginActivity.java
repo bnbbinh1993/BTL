@@ -39,7 +39,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
-    private MaterialButton btnGG;
     private GoogleSignInClient googleSignInClient;
     private FirebaseAuth auth;
     private static final int RC_SIGN_IN = 100;
@@ -59,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
 
         auth = FirebaseAuth.getInstance();
-        btnGG = findViewById(R.id.btnGG);
+        MaterialButton btnGG = findViewById(R.id.btnGG);
         btnGG.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

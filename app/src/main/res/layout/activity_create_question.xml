@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".CreateRoomActivity">
+    tools:context=".CreateQuestionActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -57,11 +57,11 @@
                     style="@style/TXT"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Room password"
+                    android:text="Descriptions"
                     tools:ignore="HardcodedText" />
 
                 <EditText
-                    android:id="@+id/passwordZoom"
+                    android:id="@+id/descriptions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@null"

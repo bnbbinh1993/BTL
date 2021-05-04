@@ -1,18 +1,15 @@
 package com.example.btl;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
+import android.net.Uri;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,11 +19,12 @@ import android.widget.Toast;
 
 import com.example.btl.adapter.AdapterQuestion;
 import com.example.btl.model.QS;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -37,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class CreateRoomActivity extends AppCompatActivity {
+public class CreateQuestionActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private MaterialButton btnDone;
     private MaterialButton btnNext;
@@ -54,16 +52,32 @@ public class CreateRoomActivity extends AppCompatActivity {
     private EditText answerB;
     private EditText answerC;
     private EditText nameZoom;
-    private EditText passwordZoom;
+    private EditText descriptions;
     private int AnswerTrue = 1;
-
+    private GoogleSignInAccount acct;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_room);
+        setContentView(R.layout.activity_create_question);
         init();
         initAction();
+
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void getPersonByGG() {
+
+        if (acct != null) {
+            String personName = acct.getDisplayName();
+            String personGivenName = acct.getGivenName();
+            String personFamilyName = acct.getFamilyName();
+            String personEmail = acct.getEmail();
+            String personId = acct.getId();
+            Uri personPhoto = acct.getPhotoUrl();
+
+
+        }
 
     }
 
@@ -72,7 +86,7 @@ public class CreateRoomActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setTitle("Create room");
-
+        acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         radiobuttonClick();
         btnA.setChecked(true);
         adapterQuestion = new AdapterQuestion(list);
@@ -91,52 +105,64 @@ public class CreateRoomActivity extends AppCompatActivity {
         btnPush.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final ProgressDialog progressDialog = new ProgressDialog(CreateRoomActivity.this);
+                final ProgressDialog progressDialog = new ProgressDialog(CreateQuestionActivity.this);
                 progressDialog.setTitle("Uploading");
                 progressDialog.show();
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Zoom");
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("topic");
                 reference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
                     @Override
                     public void onSuccess(DataSnapshot dataSnapshot) {
-                        long id = 0;
-                        for (DataSnapshot a : dataSnapshot.getChildren()) {
-                            id = a.getChildrenCount();
-                        }
+                        long id = dataSnapshot.getChildrenCount();
                         Map<String, String> map = new HashMap<>();
-
                         String name = nameZoom.getText().toString().trim();
-                        String password = passwordZoom.getText().toString().trim();
+                        String des = descriptions.getText().toString().trim();
 
-                        // check sau
+                        if (name.isEmpty()) {
+                            Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
+                            nameZoom.requestFocus();
+                        } else if (des.isEmpty()) {
+                            Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
+                            descriptions.requestFocus();
+                        } else {
 
-                        map.put("name", name);
-                        map.put("password", password);
-                        String idzoom = String.valueOf(id + 1);
-                        DatabaseReference data = FirebaseDatabase.getInstance().getReference().child("Zoom").child(idzoom);
-                        data.setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                DatabaseReference data1 = FirebaseDatabase.getInstance().getReference().child("Zoom").child(idzoom).child("Question");
-                                for (int i = 0; i < list.size(); i++) {
-                                    QS a = list.get(i);
-                                    data1.child(String.valueOf(i + 1)).setValue(a);
+                            map.put("name", name);
+                            map.put("descriptions", des);
+                            map.put("id", String.valueOf(id + 1000));
+                            if (acct != null) {
+                                map.put("author", acct.getDisplayName());
+                            } else {
+                                map.put("author", "Admin");
+                            }
+
+                            String idzoom = String.valueOf(id + 1);
+                            DatabaseReference data = FirebaseDatabase.getInstance().getReference().child("topic").child(idzoom);
+                            data.setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    DatabaseReference data1 = FirebaseDatabase.getInstance().getReference().child("topic").child(idzoom).child("Question");
+                                    for (int i = 0; i < list.size(); i++) {
+                                        QS a = list.get(i);
+                                        data1.child(String.valueOf(i + 1)).setValue(a);
+                                    }
+
+                                    progressDialog.dismiss();
                                 }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(CreateQuestionActivity.this, "onFailure!", Toast.LENGTH_SHORT).show();
+                                    progressDialog.dismiss();
+                                }
+                            });
 
-                                progressDialog.dismiss();
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(CreateRoomActivity.this, "onFailure!", Toast.LENGTH_SHORT).show();
-                                progressDialog.dismiss();
-                            }
-                        });
+                        }
+
 
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(CreateRoomActivity.this, "onFailure!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CreateQuestionActivity.this, "onFailure!", Toast.LENGTH_SHORT).show();
                         progressDialog.dismiss();
                     }
                 });
@@ -153,16 +179,16 @@ public class CreateRoomActivity extends AppCompatActivity {
                 String a2 = answerB.getText().toString().trim();
                 String a3 = answerC.getText().toString().trim();
                 if (q.isEmpty()) {
-                    Toast.makeText(CreateRoomActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
                     question.requestFocus();
                 } else if (a1.isEmpty()) {
-                    Toast.makeText(CreateRoomActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
                     answerA.requestFocus();
                 } else if (a2.isEmpty()) {
-                    Toast.makeText(CreateRoomActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
                     answerB.requestFocus();
                 } else if (a3.isEmpty()) {
-                    Toast.makeText(CreateRoomActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
                     answerC.requestFocus();
                 } else {
                     list.add(new QS(q, a1, a2, a3, AnswerTrue));
@@ -221,7 +247,7 @@ public class CreateRoomActivity extends AppCompatActivity {
         answerC = findViewById(R.id.edtAnswerC);
         cardQuestion = findViewById(R.id.cardQuestion);
         nameZoom = findViewById(R.id.nameZoom);
-        passwordZoom = findViewById(R.id.passwordZoom);
+        descriptions = findViewById(R.id.descriptions);
 
 
     }
