@@ -112,7 +112,7 @@ public class CreateQuestionActivity extends AppCompatActivity {
                 reference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
                     @Override
                     public void onSuccess(DataSnapshot dataSnapshot) {
-                        long id = dataSnapshot.getChildrenCount();
+                        long id = dataSnapshot.getChildrenCount() + 1000;
                         Map<String, String> map = new HashMap<>();
                         String name = nameZoom.getText().toString().trim();
                         String des = descriptions.getText().toString().trim();
@@ -127,14 +127,14 @@ public class CreateQuestionActivity extends AppCompatActivity {
 
                             map.put("name", name);
                             map.put("descriptions", des);
-                            map.put("id", String.valueOf(id + 1000));
+                            map.put("id", String.valueOf(id));
                             if (acct != null) {
                                 map.put("author", acct.getDisplayName());
                             } else {
                                 map.put("author", "Admin");
                             }
 
-                            String idzoom = String.valueOf(id + 1);
+                            String idzoom = String.valueOf(id);
                             DatabaseReference data = FirebaseDatabase.getInstance().getReference().child("topic").child(idzoom);
                             data.setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override

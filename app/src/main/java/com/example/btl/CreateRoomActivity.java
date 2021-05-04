@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -13,11 +14,15 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +46,7 @@ public class CreateRoomActivity extends AppCompatActivity {
     }
 
     private void initAction() {
+        setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setTitle("Create room");
@@ -53,6 +59,15 @@ public class CreateRoomActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private void init() {
+        toolbar = findViewById(R.id.toolbar);
+        nameRoom = findViewById(R.id.nameRoom);
+        passwordRoom = findViewById(R.id.passwordRoom);
+        topicId = findViewById(R.id.topicId);
+        timeTest = findViewById(R.id.timeTest);
+        btnCreate = findViewById(R.id.btnCreate);
     }
 
     private void create() {
@@ -74,11 +89,10 @@ public class CreateRoomActivity extends AppCompatActivity {
             topicId.requestFocus();
         } else {
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("topic");
-            reference.child(topic).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            reference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
                 @Override
-                public void onComplete(@NonNull Task<DataSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        //create room
+                public void onSuccess(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.hasChild(topic)) {
                         if (account != null) {
                             Map<String, String> map = new HashMap<>();
                             map.put("name", name);
@@ -88,38 +102,44 @@ public class CreateRoomActivity extends AppCompatActivity {
                             map.put("id", account.getId());
                             map.put("isPlay", "0");
                             map.put("isStop", "0");
-                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Room").child(account.getId());
-                            reference.setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            map.put("author", account.getDisplayName());
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(Objects.requireNonNull(account.getId()));
+                            reference.setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        //đẩy vào phòng
-                                        Toast.makeText(CreateRoomActivity.this, "isSuccessful!", Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        Toast.makeText(CreateRoomActivity.this, "Error!", Toast.LENGTH_SHORT).show();
-                                    }
+                                public void onSuccess(Void aVoid) {
+                                    Toast.makeText(CreateRoomActivity.this, "isSuccessful!", Toast.LENGTH_SHORT).show();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(CreateRoomActivity.this, "Error!", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         } else {
                             Toast.makeText(CreateRoomActivity.this, "Error!", Toast.LENGTH_SHORT).show();
                         }
-
-
                     } else {
-                        Toast.makeText(CreateRoomActivity.this, "Please double check the topic id!", Toast.LENGTH_SHORT).show();
-                        topicId.requestFocus();
+                        Toast.makeText(CreateRoomActivity.this, "Error!", Toast.LENGTH_SHORT).show();
                     }
                 }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(CreateRoomActivity.this, "Error!", Toast.LENGTH_SHORT).show();
+                }
             });
+
         }
     }
 
-    private void init() {
-        toolbar = findViewById(R.id.toolbar);
-        nameRoom = findViewById(R.id.nameRoom);
-        passwordRoom = findViewById(R.id.passwordRoom);
-        topicId = findViewById(R.id.topicId);
-        timeTest = findViewById(R.id.timeTest);
-        btnCreate = findViewById(R.id.btnCreate);
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
+
+
 }

@@ -6,10 +6,12 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.btl.adapter.AdapterTopic;
@@ -32,6 +34,9 @@ public class TopicActivity extends AppCompatActivity {
     private GoogleSignInAccount acct;
     private RecyclerView recyclerView;
     private AdapterTopic adapterTopic;
+    private List<Topic> topicList = new ArrayList<>();
+    private ProgressBar progress_bar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,48 +48,54 @@ public class TopicActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setTitle("Create room");
+        getSupportActionBar().setTitle("Topic");
         acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
 
-
-        adapterTopic = new AdapterTopic(getDataByFirebase());
+        adapterTopic = new AdapterTopic(topicList);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
         recyclerView.setAdapter(adapterTopic);
-        adapterTopic.ClickListioner(new ClickItem() {
-            @Override
-            public void click(int position) {
-                Toast.makeText(TopicActivity.this, "Oke", Toast.LENGTH_SHORT).show();
-            }
-        });
-
+        getDataByFirebase();
 
     }
 
     private void init() {
         toolbar = findViewById(R.id.toolbar);
         recyclerView = findViewById(R.id.mRecyclerview);
+        progress_bar = findViewById(R.id.progress_bar);
 
     }
 
 
-    private List<Topic> getDataByFirebase() {
-        List<Topic> result = new ArrayList<>();
+    private void getDataByFirebase() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("topic");
         reference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (task.isSuccessful()) {
-                    for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                    topicList.clear();
+                    for (DataSnapshot snapshot : Objects.requireNonNull(task.getResult()).getChildren()) {
                         Topic T = snapshot.getValue(Topic.class);
-                        result.add(T);
+                        topicList.add(T);
                     }
+
+                    adapterTopic.notifyDataSetChanged();
+                    adapterTopic.ClickListener(new ClickItem() {
+                        @Override
+                        public void click(int position) {
+                            Toast.makeText(TopicActivity.this, "Oke", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    progress_bar.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+
                 } else {
                     Toast.makeText(TopicActivity.this, "Null", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-        return result;
+
     }
 
     @Override
@@ -93,7 +104,7 @@ public class TopicActivity extends AppCompatActivity {
             onBackPressed();
             return true;
         } else if (item.getItemId() == R.id.add) {
-            Toast.makeText(this, "Oke", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(TopicActivity.this, CreateQuestionActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }
@@ -104,4 +115,11 @@ public class TopicActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        getDataByFirebase();
+    }
+
 }
