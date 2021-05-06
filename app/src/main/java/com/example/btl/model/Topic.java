@@ -5,13 +5,27 @@ import java.util.List;
 
 public class Topic {
     private String name;
-    private String des;
-    private List<QS> listQuestion = new ArrayList<>();
+    private String id;
+    private String descriptions;
+    private String author;
+    private List<QS> Question = new ArrayList<>();
 
-    public Topic(String name, String des, List<QS> listQuestion) {
+
+
+    public Topic(String name, String id, String descriptions, String author, List<QS> question) {
         this.name = name;
-        this.des = des;
-        this.listQuestion = listQuestion;
+        this.id = id;
+        this.descriptions = descriptions;
+        this.author = author;
+        Question = question;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Topic() {
@@ -25,19 +39,27 @@ public class Topic {
         this.name = name;
     }
 
-    public String getDes() {
-        return des;
+    public String getDescriptions() {
+        return descriptions;
     }
 
-    public void setDes(String des) {
-        this.des = des;
+    public void setDescriptions(String descriptions) {
+        this.descriptions = descriptions;
     }
 
-    public List<QS> getListQuestion() {
-        return listQuestion;
+    public String getAuthor() {
+        return author;
     }
 
-    public void setListQuestion(List<QS> listQuestion) {
-        this.listQuestion = listQuestion;
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public List<QS> getQuestion() {
+        return Question;
+    }
+
+    public void setQuestion(List<QS> question) {
+        Question = question;
     }
 }

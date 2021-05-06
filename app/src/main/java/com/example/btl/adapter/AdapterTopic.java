@@ -1,8 +1,10 @@
 package com.example.btl.adapter;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,8 +34,15 @@ public class AdapterTopic extends RecyclerView.Adapter<AdapterTopic.VH> {
         return new VH(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_topic, parent, false));
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
+        Topic model = topicList.get(position);
+
+        holder.name.setText("Tên: " + model.getName());
+        holder.id.setText("ID: " + model.getId());
+        holder.author.setText("Tác giả: " + model.getAuthor());
+
 
     }
 
@@ -44,8 +53,18 @@ public class AdapterTopic extends RecyclerView.Adapter<AdapterTopic.VH> {
     }
 
     static class VH extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        private TextView name;
+        private TextView id;
+        private TextView author;
+
         public VH(@NonNull View itemView) {
             super(itemView);
+
+            name = itemView.findViewById(R.id.name);
+            id = itemView.findViewById(R.id.id);
+            author = itemView.findViewById(R.id.author);
+
         }
 
         @Override

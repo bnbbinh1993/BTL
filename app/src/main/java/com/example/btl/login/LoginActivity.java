@@ -20,6 +20,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -91,16 +92,12 @@ public class LoginActivity extends AppCompatActivity {
 
     private void firebaseAuth(GoogleSignInAccount inAccount) {
         AuthCredential credential = GoogleAuthProvider.getCredential(inAccount.getIdToken(), null);
-        auth.signInWithCredential(credential).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+        auth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
-            public void onSuccess(AuthResult authResult) {
-                UpdateData(inAccount);
-
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()){
+                    UpdateData(inAccount);
+                }
             }
         });
     }
