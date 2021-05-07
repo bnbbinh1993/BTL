@@ -130,7 +130,7 @@ public class JoinActivity extends AppCompatActivity {
                                             // đẩy dữ liệu người chơi lên firebase ^^
                                             if (user != null) {
                                                 if (account != null) {
-                                                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(input).child("user").child(account.getId());
+                                                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(input).child("user").child(user.getUid());
                                                     Map<String, String> map = new HashMap<>();
                                                     map.put("uid", user.getUid());
                                                     //nghĩ sau ^^
@@ -139,7 +139,9 @@ public class JoinActivity extends AppCompatActivity {
                                                         @Override
                                                         public void onComplete(@NonNull Task<Void> task) {
                                                             if (task.isSuccessful()) {
-                                                                startActivity(new Intent(JoinActivity.this, RoomActivity.class));
+                                                                Intent intent = new Intent(JoinActivity.this, RoomActivity.class);
+                                                                intent.putExtra("id_room", input);
+                                                                startActivity(intent);
                                                             } else {
                                                                 Toast.makeText(JoinActivity.this, "Error!", Toast.LENGTH_SHORT).show();
                                                             }
@@ -164,8 +166,8 @@ public class JoinActivity extends AppCompatActivity {
 
                                 }
                             });
-                            Dialog dialog = builder.create();
-                            dialog.show();
+                            builder.create();
+                            builder.show();
 
 
                         } else {

@@ -1,6 +1,7 @@
 package com.example.btl;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -8,9 +9,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -56,6 +59,16 @@ public class TopicActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
         recyclerView.setAdapter(adapterTopic);
         getDataByFirebase();
+        adapterTopic.setOnClickItem(new ClickItem() {
+            @Override
+            public void click(int position) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(TopicActivity.this);
+                View view = LayoutInflater.from(TopicActivity.this).inflate(R.layout.topic_click_dialog, null);
+                builder.setView(view);
+                builder.create();
+                builder.show();
+            }
+        });
 
     }
 
@@ -80,13 +93,6 @@ public class TopicActivity extends AppCompatActivity {
                     }
 
                     adapterTopic.notifyDataSetChanged();
-                    adapterTopic.ClickListener(new ClickItem() {
-                        @Override
-                        public void click(int position) {
-                            Toast.makeText(TopicActivity.this, "Oke", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
                     progress_bar.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
 

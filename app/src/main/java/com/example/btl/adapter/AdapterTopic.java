@@ -20,8 +20,8 @@ public class AdapterTopic extends RecyclerView.Adapter<AdapterTopic.VH> {
     private List<Topic> topicList = new ArrayList<>();
     private static ClickItem item;
 
-    public void ClickListener(ClickItem clickItem) {
-        item = clickItem;
+    public void setOnClickItem(ClickItem onClickItem1) {
+        item = onClickItem1;
     }
 
     public AdapterTopic(List<Topic> topicList) {
@@ -42,7 +42,12 @@ public class AdapterTopic extends RecyclerView.Adapter<AdapterTopic.VH> {
         holder.name.setText("Tên: " + model.getName());
         holder.id.setText("ID: " + model.getId());
         holder.author.setText("Tác giả: " + model.getAuthor());
-
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                item.click(position);
+            }
+        });
 
     }
 
@@ -52,7 +57,7 @@ public class AdapterTopic extends RecyclerView.Adapter<AdapterTopic.VH> {
 
     }
 
-    static class VH extends RecyclerView.ViewHolder implements View.OnClickListener {
+    static class VH extends RecyclerView.ViewHolder {
 
         private TextView name;
         private TextView id;
@@ -67,9 +72,6 @@ public class AdapterTopic extends RecyclerView.Adapter<AdapterTopic.VH> {
 
         }
 
-        @Override
-        public void onClick(View v) {
-            item.click(getAdapterPosition());
-        }
+
     }
 }

@@ -18,6 +18,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,6 +39,8 @@ public class CreateRoomActivity extends AppCompatActivity {
     private EditText timeTest;
     private MaterialButton btnCreate;
     private GoogleSignInAccount account;
+    private FirebaseAuth auth;
+    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +55,10 @@ public class CreateRoomActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setTitle("Create room");
+
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
+
         account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         btnCreate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,8 +96,8 @@ public class CreateRoomActivity extends AppCompatActivity {
             Toast.makeText(this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
             topicId.requestFocus();
         } else {
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("topic");
-            reference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+            DatabaseReference topicRef = FirebaseDatabase.getInstance().getReference().child("topic");
+            topicRef.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
                 @Override
                 public void onSuccess(DataSnapshot dataSnapshot) {
                     if (dataSnapshot.hasChild(topic)) {
@@ -99,50 +107,44 @@ public class CreateRoomActivity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(DataSnapshot dataSnapshot) {
                                     if (dataSnapshot.hasChild("room")) {
-                                        Query lastQuery = reference.child("room").orderByKey().limitToLast(1);
-                                        lastQuery.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+
+                                        reference.child("room").get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
                                             @Override
                                             public void onSuccess(DataSnapshot dataSnapshot) {
-                                                String last_id = dataSnapshot.child("id").getValue().toString();
-                                                Map<String, String> map = new HashMap<>();
-                                                map.put("name", name);
-                                                map.put("password", pass);
-                                                   map.put("topic", topic);
-                                                map.put("time", time);
-                                                map.put("id", String.valueOf(Integer.parseInt(last_id) + 1));
-                                                map.put("isPlay", "0");
-                                                map.put("isStop", "0");
-                                                map.put("author", account.getDisplayName());
-                                                reference.child("room").child(String.valueOf(Integer.parseInt(last_id) + 1)).setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        Toast.makeText(CreateRoomActivity.this, "isSuccessful!", Toast.LENGTH_SHORT).show();
+                                                if (dataSnapshot != null) {
+                                                    String id = "";
+                                                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                                        id = ds.child("id").getValue().toString();
                                                     }
-                                                }).addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
+                                                    if (user != null) {
+                                                        Map<String, String> map = new HashMap<>();
+                                                        map.put("uid", user.getUid());
+                                                        map.put("name", name);
+                                                        map.put("password", pass);
+                                                        map.put("topic", topic);
+                                                        map.put("time", time);
+                                                        map.put("id", String.valueOf(Integer.parseInt(id) + 1));
+                                                        map.put("isPlay", "0");
+                                                        map.put("isStop", "0");
+                                                        map.put("author", account.getDisplayName());
+                                                        reference.child("room").child(String.valueOf(Integer.parseInt(id) + 1)).setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                Toast.makeText(CreateRoomActivity.this, "isSuccessful!", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        }).addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception e) {
+                                                                Toast.makeText(CreateRoomActivity.this, "Error!", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        });
+                                                    } else {
                                                         Toast.makeText(CreateRoomActivity.this, "Error!", Toast.LENGTH_SHORT).show();
                                                     }
-                                                });
-                                            }
-                                        });
+
+                                                }
 
 
-
-                                    } else {
-                                        Map<String, String> map = new HashMap<>();
-                                        map.put("name", name);
-                                        map.put("password", pass);
-                                        map.put("topic", topic);
-                                        map.put("time", time);
-                                        map.put("id", "1000");
-                                        map.put("isPlay", "0");
-                                        map.put("isStop", "0");
-                                        map.put("author", account.getDisplayName());
-                                        reference.child("room").child("1000").setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                Toast.makeText(CreateRoomActivity.this, "isSuccessful!", Toast.LENGTH_SHORT).show();
                                             }
                                         }).addOnFailureListener(new OnFailureListener() {
                                             @Override
@@ -150,15 +152,42 @@ public class CreateRoomActivity extends AppCompatActivity {
                                                 Toast.makeText(CreateRoomActivity.this, "Error!", Toast.LENGTH_SHORT).show();
                                             }
                                         });
+
+
+                                    } else {
+                                        if (user != null) {
+                                            Map<String, String> map = new HashMap<>();
+                                            map.put("uid", user.getUid());
+                                            map.put("name", name);
+                                            map.put("password", pass);
+                                            map.put("topic", topic);
+                                            map.put("time", time);
+                                            map.put("id", "1000");
+                                            map.put("isPlay", "0");
+                                            map.put("isStop", "0");
+                                            map.put("author", account.getDisplayName());
+                                            reference.child("room").child("1000").setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Toast.makeText(CreateRoomActivity.this, "isSuccessful!", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Toast.makeText(CreateRoomActivity.this, "Error!", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                        } else {
+                                            Toast.makeText(CreateRoomActivity.this, "Error!", Toast.LENGTH_SHORT).show();
+                                        }
                                     }
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-
+                                    Toast.makeText(CreateRoomActivity.this, "Error!", Toast.LENGTH_SHORT).show();
                                 }
                             });
-
 
                         } else {
                             Toast.makeText(CreateRoomActivity.this, "Error!", Toast.LENGTH_SHORT).show();
