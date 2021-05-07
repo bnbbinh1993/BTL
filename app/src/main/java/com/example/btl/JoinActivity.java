@@ -1,6 +1,7 @@
 package com.example.btl;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -34,8 +35,10 @@ import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -85,6 +88,14 @@ public class JoinActivity extends AppCompatActivity {
         mRecyclerview.setLayoutManager(new GridLayoutManager(this, 1));
         mRecyclerview.setAdapter(adapterRoom);
 
+        adapterRoom.setClickItem(new ClickItem() {
+            @Override
+            public void click(int position) {
+
+                joinClick(roomList.get(position).getId());
+            }
+        });
+
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
@@ -94,96 +105,99 @@ public class JoinActivity extends AppCompatActivity {
         btnJoin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                join();
+                String input = edtJoin.getText().toString().trim();
+                if (input.isEmpty()) {
+                    Toast.makeText(JoinActivity.this, "Null", Toast.LENGTH_SHORT).show();
+                    edtJoin.requestFocus();
+                } else {
+                    joinClick(input);
+                }
             }
         });
 
     }
 
-    private void join() {
-        String input = edtJoin.getText().toString().trim();
-        if (input.isEmpty()) {
-            Toast.makeText(JoinActivity.this, "Null", Toast.LENGTH_SHORT).show();
-            edtJoin.requestFocus();
-        } else {
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room");
-            reference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
-                @Override
-                public void onSuccess(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.hasChild(input)) {
-                        if (!dataSnapshot.child(input).child("password").getValue().equals("0")) {
-                            Toast.makeText(JoinActivity.this, "Có password", Toast.LENGTH_SHORT).show();
-                            AlertDialog.Builder builder = new AlertDialog.Builder(JoinActivity.this);
-                            builder.setTitle("Input password");
-                            View view = LayoutInflater.from(JoinActivity.this).inflate(R.layout.check_password_dialog, null);
-                            EditText ip = view.findViewById(R.id.password);
-                            builder.setView(view);
-                            builder.setPositiveButton("Xác nhận", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if (ip.getText().toString().trim().isEmpty()) {
-                                        Toast.makeText(JoinActivity.this, "Vui lòng nhập password!", Toast.LENGTH_SHORT).show();
-                                        ip.requestFocus();
-                                    } else {
-                                        if (ip.getText().toString().trim().equals(dataSnapshot.child(input).child("password").getValue())) {
-                                            dialog.dismiss();
-                                            // đẩy dữ liệu người chơi lên firebase ^^
-                                            if (user != null) {
-                                                if (account != null) {
-                                                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(input).child("user").child(user.getUid());
-                                                    Map<String, String> map = new HashMap<>();
-                                                    map.put("uid", user.getUid());
-                                                    //nghĩ sau ^^
-                                                    //cập nhật hoạt động cửa user
-                                                    reference.setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                        @Override
-                                                        public void onComplete(@NonNull Task<Void> task) {
-                                                            if (task.isSuccessful()) {
-                                                                Intent intent = new Intent(JoinActivity.this, RoomActivity.class);
-                                                                intent.putExtra("id_room", input);
-                                                                startActivity(intent);
-                                                            } else {
-                                                                Toast.makeText(JoinActivity.this, "Error!", Toast.LENGTH_SHORT).show();
-                                                            }
-                                                        }
-                                                    });
+    private void joinClick(String key) {
 
-                                                } else {
-                                                    Toast.makeText(JoinActivity.this, "Error!", Toast.LENGTH_SHORT).show();
-                                                }
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room");
+        reference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChild(key)) {
+                    if (!dataSnapshot.child(key).child("password").getValue().equals("0")) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(JoinActivity.this);
+                        View view = LayoutInflater.from(JoinActivity.this).inflate(R.layout.check_password_dialog, null);
+                        EditText ip = view.findViewById(R.id.password);
+                        MaterialButton mConfirm = view.findViewById(R.id.mConfirm);
+                        builder.setView(view);
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                        mConfirm.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (ip.getText().toString().trim().isEmpty()) {
+                                    Toast.makeText(JoinActivity.this, "Vui lòng nhập password!", Toast.LENGTH_SHORT).show();
+                                    ip.requestFocus();
+                                } else {
+                                    if (ip.getText().toString().trim().equals(dataSnapshot.child(key).child("password").getValue())) {
+                                        dialog.dismiss();
+                                        // đẩy dữ liệu người chơi lên firebase ^^
+                                        if (user != null) {
+                                            if (account != null) {
+                                                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(key).child("user").child(user.getUid());
+                                                Map<String, String> map = new HashMap<>();
+                                                map.put("uid", user.getUid());
+                                                //nghĩ sau ^^
+                                                //cập nhật hoạt động cửa user
+                                                reference.setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if (task.isSuccessful()) {
+                                                            Intent intent = new Intent(JoinActivity.this, RoomActivity.class);
+                                                            intent.putExtra("id_room", key);
+                                                            startActivity(intent);
+                                                        } else {
+                                                            Toast.makeText(JoinActivity.this, "Error!", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                });
+
                                             } else {
                                                 Toast.makeText(JoinActivity.this, "Error!", Toast.LENGTH_SHORT).show();
                                             }
-
-
                                         } else {
                                             Toast.makeText(JoinActivity.this, "Error!", Toast.LENGTH_SHORT).show();
-                                            ip.requestFocus();
-                                            dialog.dismiss();
                                         }
 
+
+                                    } else {
+                                        Toast.makeText(JoinActivity.this, "Error!", Toast.LENGTH_SHORT).show();
+                                        ip.requestFocus();
+                                        dialog.dismiss();
                                     }
 
                                 }
-                            });
-                            builder.create();
-                            builder.show();
+                            }
+                        });
 
 
-                        } else {
-                            Toast.makeText(JoinActivity.this, "Không có password", Toast.LENGTH_SHORT).show();
-                        }
                     } else {
-                        Toast.makeText(JoinActivity.this, "Không có phòng trên", Toast.LENGTH_SHORT).show();
+
+                        // chưa làm gì với nó nè
+
+                        Toast.makeText(JoinActivity.this, "Không có password", Toast.LENGTH_SHORT).show();
                     }
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
+                } else {
                     Toast.makeText(JoinActivity.this, "Không có phòng trên", Toast.LENGTH_SHORT).show();
                 }
-            });
-        }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(JoinActivity.this, "Không có phòng trên", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     private void getDataByFirebase() {
@@ -233,4 +247,5 @@ public class JoinActivity extends AppCompatActivity {
         super.onResume();
         //reload
     }
+
 }

@@ -8,8 +8,10 @@ public class Room {
     private String id;
     private String isPlay;
     private String isStop;
+    private String author;
+    private String uid;
 
-    public Room(String name, String password, String topic, String time, String id, String isPlay, String isStop) {
+    public Room(String name, String password, String topic, String time, String id, String isPlay, String isStop, String author, String uid) {
         this.name = name;
         this.password = password;
         this.topic = topic;
@@ -17,6 +19,8 @@ public class Room {
         this.id = id;
         this.isPlay = isPlay;
         this.isStop = isStop;
+        this.author = author;
+        this.uid = uid;
     }
 
     public Room() {
@@ -76,5 +80,21 @@ public class Room {
 
     public void setIsStop(String isStop) {
         this.isStop = isStop;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 }
