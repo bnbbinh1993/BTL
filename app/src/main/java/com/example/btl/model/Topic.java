@@ -10,22 +10,13 @@ public class Topic {
     private String author;
     private List<QS> Question = new ArrayList<>();
 
-
-
     public Topic(String name, String id, String descriptions, String author, List<QS> question) {
         this.name = name;
         this.id = id;
         this.descriptions = descriptions;
         this.author = author;
+
         Question = question;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public Topic() {
@@ -37,6 +28,14 @@ public class Topic {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getDescriptions() {
@@ -54,6 +53,8 @@ public class Topic {
     public void setAuthor(String author) {
         this.author = author;
     }
+
+
 
     public List<QS> getQuestion() {
         return Question;

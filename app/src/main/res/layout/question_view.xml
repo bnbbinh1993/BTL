@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    android:id="@+id/layoutPlay"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutPlay"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:visibility="visible">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/layoutTop"
@@ -22,7 +22,7 @@
             android:padding="10dp">
 
             <TextView
-                android:id="@+id/txtCountQ"
+                android:id="@+id/txtTotal"
                 style="@style/TXT"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -56,7 +56,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:background="@drawable/bg_5"
-                android:gravity="center"
+                android:gravity="start|center"
+                android:minWidth="75dp"
                 android:orientation="horizontal"
                 android:paddingStart="5dp"
                 android:paddingTop="5dp"
@@ -66,10 +67,12 @@
                 <ImageView
                     android:layout_width="15dp"
                     android:layout_height="15dp"
+                    android:layout_marginStart="5dp"
                     android:layout_marginEnd="4dp"
                     android:src="@drawable/ic_wall_clock" />
 
                 <TextView
+                    android:layout_marginEnd="2dp"
                     android:id="@+id/txtTime"
                     style="@style/TXT"
                     android:layout_width="wrap_content"
@@ -78,7 +81,8 @@
                     android:text="20 sec"
                     android:textColor="@color/white"
                     android:textSize="15sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -121,7 +125,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:background="#F44336"
+                android:background="@color/btnA"
                 android:gravity="center"
                 android:minHeight="100dp"
                 android:orientation="vertical"
@@ -157,7 +161,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:background="#3F51B5"
+                android:background="@color/btnB"
                 android:gravity="center"
                 android:minHeight="100dp"
                 android:orientation="vertical"
@@ -201,7 +205,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:background="#FFC107"
+                android:background="@color/btnC"
                 android:gravity="center"
                 android:minHeight="100dp"
                 android:orientation="vertical"
@@ -236,7 +240,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:background="#4CAF50"
+                android:background="@color/btnD"
                 android:gravity="center"
                 android:minHeight="100dp"
                 android:orientation="vertical"

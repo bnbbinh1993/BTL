@@ -5,17 +5,37 @@ public class QS {
     private String answerA;
     private String answerB;
     private String answerC;
+    private String answerD;
     private int answerTrue;
+    private String time;
 
     public QS() {
     }
 
-    public QS(String txtQuestion, String answerA, String answerB, String answerC, int answerTrue) {
+    public QS(String txtQuestion, String answerA, String answerB, String answerC, String answerD, int answerTrue, String time) {
         this.txtQuestion = txtQuestion;
         this.answerA = answerA;
         this.answerB = answerB;
         this.answerC = answerC;
+        this.answerD = answerD;
         this.answerTrue = answerTrue;
+        this.time = time;
+    }
+
+    public String getAnswerD() {
+        return answerD;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public void setAnswerD(String answerD) {
+        this.answerD = answerD;
     }
 
     public String getTxtQuestion() {

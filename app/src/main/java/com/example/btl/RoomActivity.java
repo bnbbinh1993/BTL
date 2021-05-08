@@ -5,19 +5,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.example.btl.adapter.AdapterUser;
 import com.example.btl.model.Topic;
 import com.example.btl.model.User;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,11 +31,18 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
+
+import java.sql.Time;
 import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
+
 import java.util.Map;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 public class RoomActivity extends AppCompatActivity {
     private RecyclerView mRecyclerview;
@@ -45,6 +53,24 @@ public class RoomActivity extends AppCompatActivity {
     private MaterialButton btnCancel, btnStart;
     private String id_room = "";
 
+    private LinearLayout layoutWait;
+    private RelativeLayout layoutPlay;
+    private CountDownTimer count;
+    private CountDownTimer downTimer;
+
+    private Timer timer;
+
+    private CountDownTimer postDelay;
+    private TextView txtCountDownTime;
+    private Topic model = new Topic();
+    private int position = 1;
+    private int answser = 0;
+    private int point = 0;
+    private long keyTime = 1000;
+
+
+    private TextView txtQuestion, txtAnswerA, txtAnswerB, txtAnswerC, txtAnswerD, txtTotal, txtTime;
+    private LinearLayout layoutA, layoutB, layoutC, layoutD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,23 +81,238 @@ public class RoomActivity extends AppCompatActivity {
         initUtils();
         getDataByFirebase();
         initPlay();
+        actionClick();
 
 
     }
 
     private void initPlay() {
-        btnStart.setOnClickListener(new View.OnClickListener() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
+        reference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onClick(View v) {
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isPlay");
-                Map<String, String> map = new HashMap<>();
-                map.put("isPlay", "1");
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (Objects.requireNonNull(snapshot.child("isPlay").getValue()).toString().equals("1")) {
+                    if (Objects.requireNonNull(snapshot.child("isStop").getValue()).toString().equals("0")) {
+                        count = new CountDownTimer(4000, 1000) {
+                            @SuppressLint("SetTextI18n")
+                            @Override
+                            public void onTick(long millisUntilFinished) {
+                                txtCountDownTime.setText((int) (millisUntilFinished / 1000) + " sec");
+                                if ((int) (millisUntilFinished / 1000) == 0) {
+                                    txtCountDownTime.setText("Start");
+                                }
+                            }
 
-                reference.setValue(map);
+                            @Override
+                            public void onFinish() {
+                                showPlay();
+                                count.cancel();
+                            }
+                        }.start();
+
+                    } else {
+                        showStop();
+                    }
+                } else {
+                    //chua chay
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
     }
+
+    private void stopCountdown() {
+        if (downTimer != null) {
+            downTimer.cancel();
+            downTimer = null;
+        }
+    }
+
+
+    private void showStop() {
+        layoutPlay.setVisibility(View.GONE);
+        layoutWait.setVisibility(View.VISIBLE);
+    }
+
+    private void showPlay() {
+        layoutPlay.setVisibility(View.VISIBLE);
+        layoutWait.setVisibility(View.GONE);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String id_question = Objects.requireNonNull(snapshot.child("topic").getValue()).toString();
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("topic").child(id_question);
+                reference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+                    @Override
+                    public void onSuccess(DataSnapshot dataSnapshot) {
+                        model = dataSnapshot.getValue(Topic.class);
+                        assert model != null;
+                        isPlay();
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+    }
+
+    private void updateUI() {
+        txtQuestion.setText(model.getQuestion().get(position).getTxtQuestion());
+        txtAnswerA.setText(model.getQuestion().get(position).getAnswerA());
+        txtAnswerB.setText(model.getQuestion().get(position).getAnswerB());
+        txtAnswerC.setText(model.getQuestion().get(position).getAnswerC());
+        txtAnswerD.setText(model.getQuestion().get(position).getAnswerD());
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void isPlay() {
+        resetUI();
+        updateUI();
+        countdown();
+    }
+
+    private void countdown() {
+        downTimer = new CountDownTimer(10000, 1000) {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onTick(long millisUntilFinished) {
+                txtTime.setText((int) (millisUntilFinished / 1000) + " sec");
+                Log.d("TAG", "onTick: " + millisUntilFinished);
+            }
+
+            @Override
+            public void onFinish() {
+                stopCountdown();
+                checkAnwser();
+
+            }
+        }.start();
+
+    }
+
+
+    private void setPostDelay() {
+        try {
+            Thread.sleep(2000);
+            isPlay();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void actionClick() {
+
+        layoutA.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutA.setBackgroundResource(R.color.btnA);
+                layoutB.setBackgroundResource(R.color.test_1);
+                layoutC.setBackgroundResource(R.color.test_1);
+                layoutD.setBackgroundResource(R.color.test_1);
+
+                answser = 1;
+            }
+        });
+        layoutB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutA.setBackgroundResource(R.color.test_1);
+                layoutB.setBackgroundResource(R.color.btnB);
+                layoutC.setBackgroundResource(R.color.test_1);
+                layoutD.setBackgroundResource(R.color.test_1);
+                answser = 2;
+
+            }
+        });
+        layoutC.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutA.setBackgroundResource(R.color.test_1);
+                layoutB.setBackgroundResource(R.color.test_1);
+                layoutC.setBackgroundResource(R.color.btnC);
+                layoutD.setBackgroundResource(R.color.test_1);
+                answser = 3;
+
+            }
+        });
+        layoutD.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutA.setBackgroundResource(R.color.test_1);
+                layoutB.setBackgroundResource(R.color.test_1);
+                layoutC.setBackgroundResource(R.color.test_1);
+                layoutD.setBackgroundResource(R.color.btnD);
+                answser = 4;
+            }
+        });
+
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void checkAnwser() {
+        if (answser == model.getQuestion().get(position).getAnswerTrue()) {
+            point += 100;
+        }
+
+        switch (model.getQuestion().get(position).getAnswerTrue()) {
+            case 1: {
+                layoutA.setBackgroundResource(R.color.correct);
+                layoutB.setBackgroundResource(R.color.wrong);
+                layoutC.setBackgroundResource(R.color.wrong);
+                layoutD.setBackgroundResource(R.color.wrong);
+                break;
+            }
+            case 2: {
+                layoutA.setBackgroundResource(R.color.wrong);
+                layoutB.setBackgroundResource(R.color.correct);
+                layoutC.setBackgroundResource(R.color.wrong);
+                layoutD.setBackgroundResource(R.color.wrong);
+                break;
+            }
+            case 3: {
+                layoutA.setBackgroundResource(R.color.wrong);
+                layoutB.setBackgroundResource(R.color.wrong);
+                layoutC.setBackgroundResource(R.color.correct);
+                layoutD.setBackgroundResource(R.color.wrong);
+                break;
+            }
+            case 4: {
+                layoutA.setBackgroundResource(R.color.wrong);
+                layoutB.setBackgroundResource(R.color.wrong);
+                layoutC.setBackgroundResource(R.color.wrong);
+                layoutD.setBackgroundResource(R.color.correct);
+                break;
+            }
+        }
+        position++;
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("coin").child(user.getUid());
+        reference.setValue(point).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                setPostDelay();
+            }
+        });
+
+    }
+
+    private void resetUI() {
+        layoutA.setBackgroundResource(R.color.btnA);
+        layoutB.setBackgroundResource(R.color.btnB);
+        layoutC.setBackgroundResource(R.color.btnC);
+        layoutD.setBackgroundResource(R.color.btnD);
+    }
+
 
     private void getDataByFirebase() {
 
@@ -85,7 +326,7 @@ public class RoomActivity extends AppCompatActivity {
                     userList.add(model);
                 }
                 adapterUser.notifyDataSetChanged();
-                Log.d("TAG", "onComplete: " + userList.size());
+
             }
 
             @Override
@@ -100,6 +341,7 @@ public class RoomActivity extends AppCompatActivity {
     private void initUtils() {
         id_room = getIntent().getStringExtra("id_room");
         userList = new ArrayList<>();
+
         adapterUser = new AdapterUser(userList);
         mRecyclerview.setHasFixedSize(true);
         mRecyclerview.setLayoutManager(new GridLayoutManager(this, 6));
@@ -111,7 +353,7 @@ public class RoomActivity extends AppCompatActivity {
         ref.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
             public void onSuccess(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.child("uid").getValue().toString().equals(user.getUid())) {
+                if (Objects.requireNonNull(dataSnapshot.child("uid").getValue()).toString().equals(user.getUid())) {
                     btnCancel.setVisibility(View.VISIBLE);
                     btnStart.setVisibility(View.VISIBLE);
                 } else {
@@ -120,12 +362,36 @@ public class RoomActivity extends AppCompatActivity {
                 }
             }
         });
+
+        btnStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isPlay");
+                reference.setValue("1");
+            }
+        });
+
     }
 
     private void init() {
         mRecyclerview = findViewById(R.id.mRecyclerview);
         btnCancel = findViewById(R.id.btnCancel);
         btnStart = findViewById(R.id.btnStart);
+        layoutWait = findViewById(R.id.layoutWait);
+        layoutPlay = findViewById(R.id.layoutPlay);
+        txtCountDownTime = findViewById(R.id.txtCountDownTime);
+
+        txtQuestion = findViewById(R.id.txtQuestion);
+        txtAnswerA = findViewById(R.id.txtAnswerA);
+        txtAnswerB = findViewById(R.id.txtAnswerB);
+        txtAnswerC = findViewById(R.id.txtAnswerC);
+        txtAnswerD = findViewById(R.id.txtAnswerD);
+        txtTotal = findViewById(R.id.txtTotal);
+        txtTime = findViewById(R.id.txtTime);
+        layoutA = findViewById(R.id.layoutA);
+        layoutB = findViewById(R.id.layoutB);
+        layoutC = findViewById(R.id.layoutC);
+        layoutD = findViewById(R.id.layoutD);
     }
 
     @Override
@@ -134,6 +400,8 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     @Override
+
+
     protected void onStop() {
         super.onStop();
         removeValue();
@@ -161,5 +429,23 @@ public class RoomActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        cancelTimer();
+    }
+
+    private void cancelTimer() {
+        if (count != null) {
+            count.cancel();
+        }
+        if (downTimer != null) {
+            downTimer.cancel();
+        }
+        if (postDelay != null) {
+            postDelay.cancel();
+        }
     }
 }

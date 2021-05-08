@@ -47,10 +47,12 @@ public class CreateQuestionActivity extends AppCompatActivity {
     private RadioButton btnA;
     private RadioButton btnB;
     private RadioButton btnC;
+    private RadioButton btnD;
     private EditText question;
     private EditText answerA;
     private EditText answerB;
     private EditText answerC;
+    private EditText answerD;
     private EditText nameZoom;
     private EditText descriptions;
     private int AnswerTrue = 1;
@@ -178,6 +180,7 @@ public class CreateQuestionActivity extends AppCompatActivity {
                 String a1 = answerA.getText().toString().trim();
                 String a2 = answerB.getText().toString().trim();
                 String a3 = answerC.getText().toString().trim();
+                String a4 = answerD.getText().toString().trim();
                 if (q.isEmpty()) {
                     Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
                     question.requestFocus();
@@ -190,8 +193,11 @@ public class CreateQuestionActivity extends AppCompatActivity {
                 } else if (a3.isEmpty()) {
                     Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
                     answerC.requestFocus();
+                } else if (a4.isEmpty()) {
+                    Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
+                    answerD.requestFocus();
                 } else {
-                    list.add(new QS(q, a1, a2, a3, AnswerTrue));
+                    list.add(new QS(q, a1, a2, a3, a4, AnswerTrue,"15000"));
                     adapterQuestion.notifyDataSetChanged();
                 }
 
@@ -208,6 +214,7 @@ public class CreateQuestionActivity extends AppCompatActivity {
                 btnA.setChecked(true);
                 btnB.setChecked(false);
                 btnC.setChecked(false);
+                btnD.setChecked(false);
                 AnswerTrue = 1;
             }
         });
@@ -217,6 +224,8 @@ public class CreateQuestionActivity extends AppCompatActivity {
                 btnA.setChecked(false);
                 btnB.setChecked(true);
                 btnC.setChecked(false);
+                btnC.setChecked(false);
+                btnD.setChecked(false);
                 AnswerTrue = 2;
             }
         });
@@ -227,7 +236,18 @@ public class CreateQuestionActivity extends AppCompatActivity {
                 btnA.setChecked(false);
                 btnB.setChecked(false);
                 btnC.setChecked(true);
+                btnD.setChecked(false);
                 AnswerTrue = 3;
+            }
+        });
+        btnD.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                btnA.setChecked(false);
+                btnB.setChecked(false);
+                btnC.setChecked(false);
+                btnD.setChecked(true);
+                AnswerTrue = 4;
             }
         });
     }
@@ -248,6 +268,8 @@ public class CreateQuestionActivity extends AppCompatActivity {
         cardQuestion = findViewById(R.id.cardQuestion);
         nameZoom = findViewById(R.id.nameZoom);
         descriptions = findViewById(R.id.descriptions);
+        btnD = findViewById(R.id.btnD);
+        answerD = findViewById(R.id.edtAnswerD);
 
 
     }
