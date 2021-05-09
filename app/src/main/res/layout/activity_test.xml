@@ -91,12 +91,15 @@
     </com.google.android.material.card.MaterialCardView>
 
     <TextView
+        android:textColor="@color/white"
         android:id="@+id/txtQuestion"
         style="@style/TXT"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/layoutAnswer1"
         android:layout_below="@+id/layoutTop"
+        android:layout_margin="10dp"
+        android:background="@drawable/bg_7"
         android:gravity="center"
         android:textSize="20sp"
         android:textStyle="bold"

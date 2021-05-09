@@ -47,20 +47,17 @@ public class AdapterRoom extends RecyclerView.Adapter<AdapterRoom.VH> {
         holder.id.setText("ID: " + model.getId());
 
 
-        String a = "<p>Trạng thái: <b> <font color ='red'>Kết thúc</color></b></p>";
+        String c = "<p>Trạng thái: <b> <font color ='red'>Kết thúc</color></b></p>";
         String b = "<p>Trạng thái: <b> <font color ='green'>Đang diên ra</color></b></p>";
-        String c = "<p>Trạng thái: <b> <font color ='blue'>Đang chờ</color></b></p>";
+        String a = "<p>Trạng thái: <b> <font color ='blue'>Đang chờ</color></b></p>";
 
 
-        if (model.getIsPlay().equals("1")) {
+        if (model.getIsPlay().equals("1") && model.getIsStop().equals("1")) {
+            setTextView(holder, c);
+        } else if (model.getIsPlay().equals("1") && model.getIsStop().equals("0")) {
             setTextView(holder, b);
         } else {
-            if (model.getIsStop().equals("1")) {
-                setTextView(holder, a);
-            } else {
-                setTextView(holder, c);
-            }
-
+            setTextView(holder, a);
         }
 
 
