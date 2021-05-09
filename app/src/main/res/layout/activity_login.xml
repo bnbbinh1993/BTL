@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/imageTop"
         android:padding="10dp"
-        android:text="Wellcome to Google Sigin"
+        android:text="Welcome to Google Sigin"
         android:textAlignment="center"
         tools:ignore="HardcodedText" />
 

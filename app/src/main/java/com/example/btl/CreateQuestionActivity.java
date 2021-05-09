@@ -208,7 +208,7 @@ public class CreateQuestionActivity extends AppCompatActivity {
 
                     int time = (Integer.parseInt(t) + 2) * 1000;
 
-                    list.add(new QS(q, a1, a2, a3, a4, AnswerTrue, t));
+                    list.add(new QS(q, a1, a2, a3, a4, AnswerTrue, String.valueOf(time)));
                     question.setText("");
                     answerA.setText("");
                     answerB.setText("");
