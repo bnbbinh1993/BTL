@@ -14,11 +14,14 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.btl.adapter.AdapterUser;
 import com.example.btl.model.Topic;
 import com.example.btl.model.User;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -50,7 +53,7 @@ public class RoomActivity extends AppCompatActivity {
     private List<User> userList;
     private FirebaseAuth auth;
     private FirebaseUser user;
-    private MaterialButton btnCancel, btnStart;
+    private MaterialButton btnCancel, btnStart, btnNext;
     private String id_room = "";
 
     private LinearLayout layoutWait;
@@ -58,17 +61,15 @@ public class RoomActivity extends AppCompatActivity {
     private CountDownTimer count;
     private CountDownTimer downTimer;
 
-    private Timer timer;
-
-    private CountDownTimer postDelay;
     private TextView txtCountDownTime;
     private Topic model = new Topic();
     private int position = 1;
     private int answser = 0;
     private int point = 0;
     private long keyTime = 1000;
+    private int size = 0;
 
-
+    private DatabaseReference mPoint;
     private TextView txtQuestion, txtAnswerA, txtAnswerB, txtAnswerC, txtAnswerD, txtTotal, txtTime;
     private LinearLayout layoutA, layoutB, layoutC, layoutD;
 
@@ -87,6 +88,7 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void initPlay() {
+        mPoint = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("coin").child(user.getUid());
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -141,6 +143,7 @@ public class RoomActivity extends AppCompatActivity {
     private void showPlay() {
         layoutPlay.setVisibility(View.VISIBLE);
         layoutWait.setVisibility(View.GONE);
+
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -151,7 +154,8 @@ public class RoomActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(DataSnapshot dataSnapshot) {
                         model = dataSnapshot.getValue(Topic.class);
-                        assert model != null;
+                        size = (int) dataSnapshot.child("Question").getChildrenCount();
+                        Log.d("Size", "onSuccess: " + size);
                         isPlay();
                     }
                 });
@@ -167,18 +171,26 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
-        txtQuestion.setText(model.getQuestion().get(position).getTxtQuestion());
-        txtAnswerA.setText(model.getQuestion().get(position).getAnswerA());
-        txtAnswerB.setText(model.getQuestion().get(position).getAnswerB());
-        txtAnswerC.setText(model.getQuestion().get(position).getAnswerC());
-        txtAnswerD.setText(model.getQuestion().get(position).getAnswerD());
+        if (position > size) {
+            Toast.makeText(this, "End Game!", Toast.LENGTH_SHORT).show();
+        } else {
+            txtQuestion.setText(model.getQuestion().get(position).getTxtQuestion());
+            txtAnswerA.setText(model.getQuestion().get(position).getAnswerA());
+            txtAnswerB.setText(model.getQuestion().get(position).getAnswerB());
+            txtAnswerC.setText(model.getQuestion().get(position).getAnswerC());
+            txtAnswerD.setText(model.getQuestion().get(position).getAnswerD());
+            unLock();
+            countdown();
+        }
+
+
     }
 
     @SuppressLint("SetTextI18n")
     private void isPlay() {
         resetUI();
         updateUI();
-        countdown();
+
     }
 
     private void countdown() {
@@ -188,26 +200,46 @@ public class RoomActivity extends AppCompatActivity {
             public void onTick(long millisUntilFinished) {
                 txtTime.setText((int) (millisUntilFinished / 1000) + " sec");
                 Log.d("TAG", "onTick: " + millisUntilFinished);
+
+                if (millisUntilFinished / 1000 == 0) {
+                    lock();
+                    checkAnwser();
+                }
             }
 
             @Override
             public void onFinish() {
                 stopCountdown();
-                checkAnwser();
+                setPostDelay();
 
             }
         }.start();
 
     }
 
+    private void lock() {
+        layoutA.setClickable(false);
+        layoutB.setClickable(false);
+        layoutC.setClickable(false);
+        layoutD.setClickable(false);
+    }
+
+    private void unLock() {
+        layoutA.setClickable(true);
+        layoutB.setClickable(true);
+        layoutC.setClickable(true);
+        layoutD.setClickable(true);
+    }
 
     private void setPostDelay() {
         try {
-            Thread.sleep(2000);
-            isPlay();
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        position++;
+        isPlay();
+
     }
 
 
@@ -261,48 +293,75 @@ public class RoomActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void checkAnwser() {
-        if (answser == model.getQuestion().get(position).getAnswerTrue()) {
-            point += 100;
+
+//        if (answser == model.getQuestion().get(position).getAnswerTrue()) {
+//            point += 100;
+//        }
+
+        int checkout = model.getQuestion().get(position).getAnswerTrue();
+
+        if (checkout == 1) {
+            layoutA.setBackgroundResource(R.color.correct);
+            layoutB.setBackgroundResource(R.color.wrong);
+            layoutC.setBackgroundResource(R.color.wrong);
+            layoutD.setBackgroundResource(R.color.wrong);
+            return;
+        }
+        if (checkout == 2) {
+            layoutA.setBackgroundResource(R.color.correct);
+            layoutB.setBackgroundResource(R.color.wrong);
+            layoutC.setBackgroundResource(R.color.wrong);
+            layoutD.setBackgroundResource(R.color.wrong);
+            return;
+        }
+        if (checkout == 3) {
+            layoutA.setBackgroundResource(R.color.correct);
+            layoutB.setBackgroundResource(R.color.wrong);
+            layoutC.setBackgroundResource(R.color.wrong);
+            layoutD.setBackgroundResource(R.color.wrong);
+            return;
+        }
+        if (checkout == 4) {
+            layoutA.setBackgroundResource(R.color.correct);
+            layoutB.setBackgroundResource(R.color.wrong);
+            layoutC.setBackgroundResource(R.color.wrong);
+            layoutD.setBackgroundResource(R.color.wrong);
         }
 
-        switch (model.getQuestion().get(position).getAnswerTrue()) {
-            case 1: {
-                layoutA.setBackgroundResource(R.color.correct);
-                layoutB.setBackgroundResource(R.color.wrong);
-                layoutC.setBackgroundResource(R.color.wrong);
-                layoutD.setBackgroundResource(R.color.wrong);
-                break;
-            }
-            case 2: {
-                layoutA.setBackgroundResource(R.color.wrong);
-                layoutB.setBackgroundResource(R.color.correct);
-                layoutC.setBackgroundResource(R.color.wrong);
-                layoutD.setBackgroundResource(R.color.wrong);
-                break;
-            }
-            case 3: {
-                layoutA.setBackgroundResource(R.color.wrong);
-                layoutB.setBackgroundResource(R.color.wrong);
-                layoutC.setBackgroundResource(R.color.correct);
-                layoutD.setBackgroundResource(R.color.wrong);
-                break;
-            }
-            case 4: {
-                layoutA.setBackgroundResource(R.color.wrong);
-                layoutB.setBackgroundResource(R.color.wrong);
-                layoutC.setBackgroundResource(R.color.wrong);
-                layoutD.setBackgroundResource(R.color.correct);
-                break;
-            }
-        }
-        position++;
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("coin").child(user.getUid());
-        reference.setValue(point).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                setPostDelay();
-            }
-        });
+
+//        switch (model.getQuestion().get(position).getAnswerTrue()) {
+//            case 1: {
+//                layoutA.setBackgroundResource(R.color.correct);
+//                layoutB.setBackgroundResource(R.color.wrong);
+//                layoutC.setBackgroundResource(R.color.wrong);
+//                layoutD.setBackgroundResource(R.color.wrong);
+//                break;
+//            }
+//            case 2: {
+//                layoutA.setBackgroundResource(R.color.wrong);
+//                layoutB.setBackgroundResource(R.color.correct);
+//                layoutC.setBackgroundResource(R.color.wrong);
+//                layoutD.setBackgroundResource(R.color.wrong);
+//                break;
+//            }
+//            case 3: {
+//                layoutA.setBackgroundResource(R.color.wrong);
+//                layoutB.setBackgroundResource(R.color.wrong);
+//                layoutC.setBackgroundResource(R.color.correct);
+//                layoutD.setBackgroundResource(R.color.wrong);
+//                break;
+//            }
+//            case 4: {
+//                layoutA.setBackgroundResource(R.color.wrong);
+//                layoutB.setBackgroundResource(R.color.wrong);
+//                layoutC.setBackgroundResource(R.color.wrong);
+//                layoutD.setBackgroundResource(R.color.correct);
+//                break;
+//            }
+//        }
+
+        //mPoint.setValue(point);
+
 
     }
 
@@ -311,6 +370,8 @@ public class RoomActivity extends AppCompatActivity {
         layoutB.setBackgroundResource(R.color.btnB);
         layoutC.setBackgroundResource(R.color.btnC);
         layoutD.setBackgroundResource(R.color.btnD);
+
+        //btnNext.setVisibility(View.GONE);
     }
 
 
@@ -371,12 +432,20 @@ public class RoomActivity extends AppCompatActivity {
             }
         });
 
+        btnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
     }
 
     private void init() {
         mRecyclerview = findViewById(R.id.mRecyclerview);
         btnCancel = findViewById(R.id.btnCancel);
         btnStart = findViewById(R.id.btnStart);
+        btnNext = findViewById(R.id.btnNext);
         layoutWait = findViewById(R.id.layoutWait);
         layoutPlay = findViewById(R.id.layoutPlay);
         txtCountDownTime = findViewById(R.id.txtCountDownTime);
@@ -444,8 +513,6 @@ public class RoomActivity extends AppCompatActivity {
         if (downTimer != null) {
             downTimer.cancel();
         }
-        if (postDelay != null) {
-            postDelay.cancel();
-        }
+
     }
 }

@@ -25,8 +25,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,23 +84,24 @@ public class TopicActivity extends AppCompatActivity {
 
     private void getDataByFirebase() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("topic");
-        reference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+        reference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                if (task.isSuccessful()) {
-                    topicList.clear();
-                    for (DataSnapshot snapshot : Objects.requireNonNull(task.getResult()).getChildren()) {
-                        Topic T = snapshot.getValue(Topic.class);
-                        topicList.add(T);
-                    }
-
-                    adapterTopic.notifyDataSetChanged();
-                    progress_bar.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-
-                } else {
-                    Toast.makeText(TopicActivity.this, "Null", Toast.LENGTH_SHORT).show();
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                topicList.clear();
+                for (DataSnapshot s : snapshot.getChildren()) {
+                    Topic T = s.getValue(Topic.class);
+                    topicList.add(T);
                 }
+
+                adapterTopic.notifyDataSetChanged();
+                progress_bar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(TopicActivity.this, "Null", Toast.LENGTH_SHORT).show();
             }
         });
 

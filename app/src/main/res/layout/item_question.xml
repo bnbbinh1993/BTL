@@ -12,7 +12,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Question 1: Tại sao không được A+?"
+        android:textColor="@color/black"
         android:textSize="15sp"
+        android:textStyle="bold"
         tools:ignore="HardcodedText" />
 
 </LinearLayout>

@@ -202,25 +202,26 @@ public class JoinActivity extends AppCompatActivity {
 
     private void getDataByFirebase() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room");
-        reference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+
+        reference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onSuccess(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 roomList.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Room T = snapshot.getValue(Room.class);
+                for (DataSnapshot s : snapshot.getChildren()) {
+                    Room T = s.getValue(Room.class);
                     roomList.add(T);
                 }
                 adapterRoom.notifyDataSetChanged();
                 progress_bar.setVisibility(View.GONE);
                 mRecyclerview.setVisibility(View.VISIBLE);
-
             }
-        }).addOnFailureListener(new OnFailureListener() {
+
             @Override
-            public void onFailure(@NonNull Exception e) {
+            public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(JoinActivity.this, "Null", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 
 

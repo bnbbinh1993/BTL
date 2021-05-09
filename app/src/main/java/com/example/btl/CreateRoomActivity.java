@@ -131,6 +131,7 @@ public class CreateRoomActivity extends AppCompatActivity {
                                                             @Override
                                                             public void onSuccess(Void aVoid) {
                                                                 Toast.makeText(CreateRoomActivity.this, "isSuccessful!", Toast.LENGTH_SHORT).show();
+                                                                finish();
                                                             }
                                                         }).addOnFailureListener(new OnFailureListener() {
                                                             @Override

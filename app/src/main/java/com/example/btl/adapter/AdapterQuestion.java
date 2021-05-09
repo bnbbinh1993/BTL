@@ -1,5 +1,6 @@
 package com.example.btl.adapter;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import java.util.List;
 
 public class AdapterQuestion extends RecyclerView.Adapter<AdapterQuestion.VH> {
     private List<QS> list = new ArrayList<>();
+    private int i = 0;
 
     public AdapterQuestion(List<QS> list) {
         this.list = list;
@@ -27,14 +29,22 @@ public class AdapterQuestion extends RecyclerView.Adapter<AdapterQuestion.VH> {
         return new VH(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_question, parent, false));
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
-        holder.txtQuestion.setText(list.get(position).getTxtQuestion());
+        int j = position + 1;
+        holder.txtQuestion.setText("Question " + j + ": " + list.get(position).getTxtQuestion());
     }
 
     @Override
     public int getItemCount() {
         return list.size();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        i = position;
+        return i;
     }
 
     static class VH extends RecyclerView.ViewHolder {

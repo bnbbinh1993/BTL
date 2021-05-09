@@ -49,6 +49,7 @@ public class CreateQuestionActivity extends AppCompatActivity {
     private RadioButton btnC;
     private RadioButton btnD;
     private EditText question;
+    private EditText edtTime;
     private EditText answerA;
     private EditText answerB;
     private EditText answerC;
@@ -87,7 +88,7 @@ public class CreateQuestionActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setTitle("Create room");
+        getSupportActionBar().setTitle("Create Topic");
         acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         radiobuttonClick();
         btnA.setChecked(true);
@@ -122,9 +123,11 @@ public class CreateQuestionActivity extends AppCompatActivity {
                         if (name.isEmpty()) {
                             Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
                             nameZoom.requestFocus();
+                            progressDialog.dismiss();
                         } else if (des.isEmpty()) {
                             Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
                             descriptions.requestFocus();
+                            progressDialog.dismiss();
                         } else {
 
                             map.put("name", name);
@@ -148,6 +151,7 @@ public class CreateQuestionActivity extends AppCompatActivity {
                                     }
 
                                     progressDialog.dismiss();
+                                    finish();
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
@@ -181,7 +185,11 @@ public class CreateQuestionActivity extends AppCompatActivity {
                 String a2 = answerB.getText().toString().trim();
                 String a3 = answerC.getText().toString().trim();
                 String a4 = answerD.getText().toString().trim();
-                if (q.isEmpty()) {
+                String t = edtTime.getText().toString().trim() + "000";
+                if (t.isEmpty()) {
+                    Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
+                    edtTime.requestFocus();
+                } else if (q.isEmpty()) {
                     Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
                     question.requestFocus();
                 } else if (a1.isEmpty()) {
@@ -197,7 +205,14 @@ public class CreateQuestionActivity extends AppCompatActivity {
                     Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
                     answerD.requestFocus();
                 } else {
-                    list.add(new QS(q, a1, a2, a3, a4, AnswerTrue,"15000"));
+                    list.add(new QS(q, a1, a2, a3, a4, AnswerTrue, t));
+                    question.setText("");
+                    answerA.setText("");
+                    answerB.setText("");
+                    answerC.setText("");
+                    answerD.setText("");
+                    edtTime.setText("");
+                    question.requestFocus();
                     adapterQuestion.notifyDataSetChanged();
                 }
 
@@ -270,6 +285,7 @@ public class CreateQuestionActivity extends AppCompatActivity {
         descriptions = findViewById(R.id.descriptions);
         btnD = findViewById(R.id.btnD);
         answerD = findViewById(R.id.edtAnswerD);
+        edtTime = findViewById(R.id.edtTime);
 
 
     }
