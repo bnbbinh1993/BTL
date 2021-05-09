@@ -100,4 +100,6 @@
 
     <include layout="@layout/question_view" />
 
+    <include layout="@layout/end_game_question" />
+
 </LinearLayout>

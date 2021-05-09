@@ -185,7 +185,7 @@ public class CreateQuestionActivity extends AppCompatActivity {
                 String a2 = answerB.getText().toString().trim();
                 String a3 = answerC.getText().toString().trim();
                 String a4 = answerD.getText().toString().trim();
-                String t = edtTime.getText().toString().trim() + "000";
+                String t = edtTime.getText().toString().trim();
                 if (t.isEmpty()) {
                     Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
                     edtTime.requestFocus();
@@ -205,6 +205,9 @@ public class CreateQuestionActivity extends AppCompatActivity {
                     Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
                     answerD.requestFocus();
                 } else {
+
+                    int time = (Integer.parseInt(t) + 2) * 1000;
+
                     list.add(new QS(q, a1, a2, a3, a4, AnswerTrue, t));
                     question.setText("");
                     answerA.setText("");

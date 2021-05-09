@@ -12,6 +12,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -92,7 +93,14 @@ public class JoinActivity extends AppCompatActivity {
             @Override
             public void click(int position) {
 
-                joinClick(roomList.get(position).getId());
+                Log.d("ISPLAY", "click: "+roomList.get(position).getIsPlay());
+
+                if (roomList.get(position).getIsPlay().equals("1")) {
+                    Toast.makeText(JoinActivity.this, "Phòng đã bắt đầu hoặc đã đóng bạn không thể tham gia!", Toast.LENGTH_SHORT).show();
+                } else {
+                    joinClick(roomList.get(position).getId());
+                }
+
             }
         });
 

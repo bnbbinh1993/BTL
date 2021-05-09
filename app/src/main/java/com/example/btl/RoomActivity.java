@@ -1,4 +1,4 @@
-package com.example.btl;
+  package com.example.btl;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -57,6 +57,7 @@ public class RoomActivity extends AppCompatActivity {
     private String id_room = "";
 
     private LinearLayout layoutWait;
+    private LinearLayout end_game;
     private RelativeLayout layoutPlay;
     private CountDownTimer count;
     private CountDownTimer downTimer;
@@ -137,12 +138,15 @@ public class RoomActivity extends AppCompatActivity {
 
     private void showStop() {
         layoutPlay.setVisibility(View.GONE);
-        layoutWait.setVisibility(View.VISIBLE);
+        layoutWait.setVisibility(View.GONE);
+        end_game.setVisibility(View.VISIBLE);
+
     }
 
     private void showPlay() {
         layoutPlay.setVisibility(View.VISIBLE);
         layoutWait.setVisibility(View.GONE);
+        end_game.setVisibility(View.GONE);
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
         reference.addValueEventListener(new ValueEventListener() {
@@ -155,7 +159,6 @@ public class RoomActivity extends AppCompatActivity {
                     public void onSuccess(DataSnapshot dataSnapshot) {
                         model = dataSnapshot.getValue(Topic.class);
                         size = (int) dataSnapshot.child("Question").getChildrenCount();
-                        Log.d("Size", "onSuccess: " + size);
                         isPlay();
                     }
                 });
@@ -170,15 +173,25 @@ public class RoomActivity extends AppCompatActivity {
 
     }
 
+    @SuppressLint("SetTextI18n")
     private void updateUI() {
         if (position > size) {
+            mPoint.setValue(point).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    showStop();
+                }
+            });
+
             Toast.makeText(this, "End Game!", Toast.LENGTH_SHORT).show();
         } else {
+            txtTotal.setText(position + "/" + size);
             txtQuestion.setText(model.getQuestion().get(position).getTxtQuestion());
             txtAnswerA.setText(model.getQuestion().get(position).getAnswerA());
             txtAnswerB.setText(model.getQuestion().get(position).getAnswerB());
             txtAnswerC.setText(model.getQuestion().get(position).getAnswerC());
             txtAnswerD.setText(model.getQuestion().get(position).getAnswerD());
+            keyTime = Long.parseLong(model.getQuestion().get(position).getTime());
             unLock();
             countdown();
         }
@@ -194,12 +207,17 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void countdown() {
-        downTimer = new CountDownTimer(10000, 1000) {
+
+        downTimer = new CountDownTimer(keyTime, 1000) {
             @SuppressLint("SetTextI18n")
             @Override
             public void onTick(long millisUntilFinished) {
-                txtTime.setText((int) (millisUntilFinished / 1000) + " sec");
-                Log.d("TAG", "onTick: " + millisUntilFinished);
+
+                if ((int) (millisUntilFinished / 1000 - 1) <= 0) {
+                    txtTime.setText("0 sec");
+                } else {
+                    txtTime.setText((int) (millisUntilFinished / 1000 - 1) + " sec");
+                }
 
                 if (millisUntilFinished / 1000 == 0) {
                     lock();
@@ -294,73 +312,43 @@ public class RoomActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void checkAnwser() {
 
-//        if (answser == model.getQuestion().get(position).getAnswerTrue()) {
-//            point += 100;
-//        }
+        if (answser == model.getQuestion().get(position).getAnswerTrue()) {
+            point += 100;
+        }
 
         int checkout = model.getQuestion().get(position).getAnswerTrue();
 
-        if (checkout == 1) {
-            layoutA.setBackgroundResource(R.color.correct);
-            layoutB.setBackgroundResource(R.color.wrong);
-            layoutC.setBackgroundResource(R.color.wrong);
-            layoutD.setBackgroundResource(R.color.wrong);
-            return;
-        }
-        if (checkout == 2) {
-            layoutA.setBackgroundResource(R.color.correct);
-            layoutB.setBackgroundResource(R.color.wrong);
-            layoutC.setBackgroundResource(R.color.wrong);
-            layoutD.setBackgroundResource(R.color.wrong);
-            return;
-        }
-        if (checkout == 3) {
-            layoutA.setBackgroundResource(R.color.correct);
-            layoutB.setBackgroundResource(R.color.wrong);
-            layoutC.setBackgroundResource(R.color.wrong);
-            layoutD.setBackgroundResource(R.color.wrong);
-            return;
-        }
-        if (checkout == 4) {
-            layoutA.setBackgroundResource(R.color.correct);
-            layoutB.setBackgroundResource(R.color.wrong);
-            layoutC.setBackgroundResource(R.color.wrong);
-            layoutD.setBackgroundResource(R.color.wrong);
-        }
 
-
-//        switch (model.getQuestion().get(position).getAnswerTrue()) {
-//            case 1: {
-//                layoutA.setBackgroundResource(R.color.correct);
-//                layoutB.setBackgroundResource(R.color.wrong);
-//                layoutC.setBackgroundResource(R.color.wrong);
-//                layoutD.setBackgroundResource(R.color.wrong);
-//                break;
-//            }
-//            case 2: {
-//                layoutA.setBackgroundResource(R.color.wrong);
-//                layoutB.setBackgroundResource(R.color.correct);
-//                layoutC.setBackgroundResource(R.color.wrong);
-//                layoutD.setBackgroundResource(R.color.wrong);
-//                break;
-//            }
-//            case 3: {
-//                layoutA.setBackgroundResource(R.color.wrong);
-//                layoutB.setBackgroundResource(R.color.wrong);
-//                layoutC.setBackgroundResource(R.color.correct);
-//                layoutD.setBackgroundResource(R.color.wrong);
-//                break;
-//            }
-//            case 4: {
-//                layoutA.setBackgroundResource(R.color.wrong);
-//                layoutB.setBackgroundResource(R.color.wrong);
-//                layoutC.setBackgroundResource(R.color.wrong);
-//                layoutD.setBackgroundResource(R.color.correct);
-//                break;
-//            }
-//        }
-
-        //mPoint.setValue(point);
+        switch (model.getQuestion().get(position).getAnswerTrue()) {
+            case 1: {
+                layoutA.setBackgroundResource(R.color.correct);
+                layoutB.setBackgroundResource(R.color.wrong);
+                layoutC.setBackgroundResource(R.color.wrong);
+                layoutD.setBackgroundResource(R.color.wrong);
+                break;
+            }
+            case 2: {
+                layoutA.setBackgroundResource(R.color.wrong);
+                layoutB.setBackgroundResource(R.color.correct);
+                layoutC.setBackgroundResource(R.color.wrong);
+                layoutD.setBackgroundResource(R.color.wrong);
+                break;
+            }
+            case 3: {
+                layoutA.setBackgroundResource(R.color.wrong);
+                layoutB.setBackgroundResource(R.color.wrong);
+                layoutC.setBackgroundResource(R.color.correct);
+                layoutD.setBackgroundResource(R.color.wrong);
+                break;
+            }
+            case 4: {
+                layoutA.setBackgroundResource(R.color.wrong);
+                layoutB.setBackgroundResource(R.color.wrong);
+                layoutC.setBackgroundResource(R.color.wrong);
+                layoutD.setBackgroundResource(R.color.correct);
+                break;
+            }
+        }
 
 
     }
@@ -461,11 +449,14 @@ public class RoomActivity extends AppCompatActivity {
         layoutB = findViewById(R.id.layoutB);
         layoutC = findViewById(R.id.layoutC);
         layoutD = findViewById(R.id.layoutD);
+        end_game = findViewById(R.id.end_game);
     }
 
     @Override
     public void onBackPressed() {
+        stopCountdown();
         removeValue();
+
     }
 
     @Override
@@ -504,15 +495,15 @@ public class RoomActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         cancelTimer();
+        stopCountdown();
     }
 
     private void cancelTimer() {
         if (count != null) {
             count.cancel();
         }
-        if (downTimer != null) {
-            downTimer.cancel();
-        }
+
 
     }
+
 }

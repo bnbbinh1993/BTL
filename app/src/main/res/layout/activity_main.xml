@@ -10,58 +10,51 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:background="@drawable/bg_1"
-        android:padding="20dp">
+        android:orientation="vertical"
+        android:padding="30dp">
 
-        <TextView
-            android:id="@+id/txtName"
-            style="@style/TXT"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:paddingTop="10dp"
-            android:text="Hello Bình"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:layout_toStartOf="@+id/mAvatar"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtName"
+                style="@style/TXT"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                style="@style/TXT"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Welcome to Quiz online by Gruop A"
+                android:textColor="@color/white"
+                tools:ignore="HardcodedText" />
+        </LinearLayout>
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/mAvatar"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_alignParentEnd="true"
+            android:layout_marginTop="10dp"
             app:civ_border_color="@color/white"
             app:civ_border_overlay="true"
             app:civ_border_width="1dp"
             app:civ_circle_background_color="@color/white" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txtName"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/bg_2">
-
-            <EditText
-                android:id="@+id/edtSearch"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:background="@null"
-                android:hint="Search"
-                android:imeOptions="actionSearch"
-                android:paddingStart="15dp"
-                android:paddingEnd="15dp"
-                android:textColor="@color/black" />
-
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/bg_3"
-                android:padding="8dp"
-                android:src="@drawable/ic_search" />
-        </LinearLayout>
     </RelativeLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -95,7 +88,7 @@
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:layout_centerInParent="true"
-                        android:src="@drawable/ic_basic" />
+                        android:src="@drawable/ic_checklist" />
                 </RelativeLayout>
 
                 <TextView
@@ -135,7 +128,7 @@
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:layout_centerInParent="true"
-                        android:src="@drawable/ic_basic" />
+                        android:src="@drawable/ic_videoconference" />
                 </RelativeLayout>
 
                 <TextView
@@ -166,7 +159,6 @@
         android:textStyle="bold" />
 
     <LinearLayout
-
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -216,7 +208,7 @@
                     android:layout_width="20dp"
                     android:layout_height="15dp"
                     android:padding="2dp"
-                    android:src="@drawable/ic_dollar" />
+                    android:src="@drawable/ic_coin" />
 
                 <TextView
                     style="@style/TXT"
@@ -265,16 +257,16 @@
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="15dp"
+                android:padding="2dp"
+                android:src="@drawable/ic_coin" />
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="15dp"
-                    android:padding="2dp"
-                    android:src="@drawable/ic_dollar" />
 
                 <TextView
                     style="@style/TXT"
@@ -333,7 +325,7 @@
                     android:layout_width="20dp"
                     android:layout_height="15dp"
                     android:padding="2dp"
-                    android:src="@drawable/ic_dollar" />
+                    android:src="@drawable/ic_coin" />
 
                 <TextView
                     style="@style/TXT"
@@ -353,191 +345,20 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <TextView
             style="@style/TXT"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="4"
-            android:textColor="@color/black"
-            android:textSize="20sp" />
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@mipmap/demo"
-            app:civ_border_color="@color/app"
-            app:civ_border_width="0dp" />
-
-        <TextView
-            style="@style/TXT"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="20dp"
-            android:paddingTop="5dp"
-            android:paddingEnd="10dp"
-            android:text="Bình"
-            android:textColor="@color/app"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_toStartOf="@+id/txtCoin"
-                android:src="@drawable/ic_dollar" />
-
-            <TextView
-                android:id="@+id/txtCoin"
-                style="@style/TXT"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:gravity="center"
-                android:text="1000"
-                android:textAlignment="center"
-                android:textColor="@color/app"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </RelativeLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp">
-
-        <TextView
-            style="@style/TXT"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="5"
-            android:textColor="@color/black"
-            android:textSize="20sp" />
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@mipmap/demo"
-            app:civ_border_color="@color/app"
-            app:civ_border_width="0dp" />
-
-        <TextView
-            style="@style/TXT"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="20dp"
-            android:paddingTop="5dp"
-            android:paddingEnd="10dp"
-            android:text="Bình"
-            android:textColor="@color/app"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-
-        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_toStartOf="@+id/txtCoin2"
-                android:src="@drawable/ic_dollar" />
-
-            <TextView
-                android:id="@+id/txtCoin2"
-                style="@style/TXT"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:gravity="center"
-                android:text="1000"
-                android:textAlignment="center"
-                android:textColor="@color/app"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </RelativeLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp">
-
-        <TextView
-            style="@style/TXT"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="6"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="bottom|center"
+            android:padding="10dp"
+            android:text="Copyright to Group A"
             android:textColor="@color/black"
-            android:textSize="20sp" />
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@mipmap/demo"
-            app:civ_border_color="@color/app"
-            app:civ_border_width="0dp" />
-
-        <TextView
-            style="@style/TXT"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="20dp"
-            android:paddingTop="5dp"
-            android:paddingEnd="10dp"
-            android:text="Bình"
-            android:textColor="@color/app"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_toStartOf="@+id/txtCoin3"
-                android:src="@drawable/ic_dollar" />
-
-            <TextView
-                android:id="@+id/txtCoin3"
-                style="@style/TXT"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:gravity="center"
-                android:text="1000"
-                android:textAlignment="center"
-                android:textColor="@color/app"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </RelativeLayout>
+            android:textStyle="italic"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
 

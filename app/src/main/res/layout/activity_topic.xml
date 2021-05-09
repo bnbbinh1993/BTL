@@ -8,12 +8,17 @@
     android:orientation="vertical"
     tools:context=".TopicActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:minHeight="?attr/actionBarSize" />
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:minHeight="?attr/actionBarSize" />
+    </com.google.android.material.card.MaterialCardView>
 
     <ProgressBar
         android:id="@+id/progress_bar"
@@ -21,7 +26,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:visibility="visible" />
-
 
 
     <androidx.recyclerview.widget.RecyclerView

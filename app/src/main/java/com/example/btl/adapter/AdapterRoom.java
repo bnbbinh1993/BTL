@@ -1,6 +1,8 @@
 package com.example.btl.adapter;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,18 +41,44 @@ public class AdapterRoom extends RecyclerView.Adapter<AdapterRoom.VH> {
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
-        Room model = roomList.get(i);
+        Room model = roomList.get(position);
 
         holder.name.setText("Tên: " + model.getName());
         holder.id.setText("ID: " + model.getId());
-        holder.author.setText("Tác giả: " + model.getAuthor());
+
+
+        String a = "<p>Trạng thái: <b> <font color ='red'>Kết thúc</color></b></p>";
+        String b = "<p>Trạng thái: <b> <font color ='green'>Đang diên ra</color></b></p>";
+        String c = "<p>Trạng thái: <b> <font color ='blue'>Đang chờ</color></b></p>";
+
+
+        if (model.getIsPlay().equals("1")) {
+            setTextView(holder, b);
+        } else {
+            if (model.getIsStop().equals("1")) {
+                setTextView(holder, a);
+            } else {
+                setTextView(holder, c);
+            }
+
+        }
+
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                item.click(i);
+                item.click(position);
             }
         });
 
+    }
+
+    private void setTextView(VH vh, String txt) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            vh.author.setText(Html.fromHtml(txt, Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            vh.author.setText(Html.fromHtml(txt));
+        }
     }
 
     @Override

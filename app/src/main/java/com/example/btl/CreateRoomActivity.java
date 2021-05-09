@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,6 +56,11 @@ public class CreateRoomActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setTitle("Create room");
+
+        Intent intent = getIntent();
+        if (intent != null) {
+            topicId.setText(intent.getStringExtra("_topic_id"));
+        }
 
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();

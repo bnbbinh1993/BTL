@@ -24,6 +24,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -67,8 +68,30 @@ public class TopicActivity extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(TopicActivity.this);
                 View view = LayoutInflater.from(TopicActivity.this).inflate(R.layout.topic_click_dialog, null);
                 builder.setView(view);
-                builder.create();
-                builder.show();
+                MaterialButton btnTest = view.findViewById(R.id.btnTest);
+                MaterialButton btnCreate = view.findViewById(R.id.btnCreate);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                btnTest.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(TopicActivity.this, TestActivity.class);
+                        intent.putExtra("_topic_id", topicList.get(position).getId());
+                        startActivity(intent);
+                        dialog.dismiss();
+                    }
+                });
+                btnCreate.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(TopicActivity.this, CreateRoomActivity.class);
+                        intent.putExtra("_topic_id", topicList.get(position).getId());
+                        startActivity(intent);
+                        dialog.dismiss();
+                    }
+                });
+
+
             }
         });
 

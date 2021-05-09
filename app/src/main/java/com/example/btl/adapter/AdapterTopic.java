@@ -49,6 +49,7 @@ public class AdapterTopic extends RecyclerView.Adapter<AdapterTopic.VH> {
             }
         });
 
+
     }
 
     @Override

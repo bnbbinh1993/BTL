@@ -8,7 +8,8 @@
     android:orientation="vertical"
     android:padding="20dp">
 
-    <Button
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnTest"
         style="@style/TXT"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,7 +18,8 @@
         android:textColor="@color/white"
         tools:ignore="HardcodedText" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
+        android:id="@id/btnCreate"
         style="@style/TXT"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
