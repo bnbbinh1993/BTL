@@ -547,7 +547,7 @@ public class RoomActivity extends AppCompatActivity {
         btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                btnPlay.setVisibility(View.GONE  );
+                btnPlay.setVisibility(View.GONE);
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("user");
                 reference.addValueEventListener(new ValueEventListener() {
                     @Override
@@ -578,6 +578,13 @@ public class RoomActivity extends AppCompatActivity {
                 builder.setView(view);
                 AlertDialog dialog = builder.create();
                 dialog.show();
+            }
+        });
+
+        btnFinsh_end.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeValue();
             }
         });
 
