@@ -1,6 +1,7 @@
 package com.example.btl;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -10,13 +11,18 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.btl.adapter.AdapterUser;
+import com.example.btl.model.Point;
 import com.example.btl.model.Topic;
 import com.example.btl.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -40,6 +46,7 @@ import org.jetbrains.annotations.NotNull;
 import java.sql.Time;
 import java.util.ArrayList;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -53,22 +60,36 @@ public class RoomActivity extends AppCompatActivity {
     private RecyclerView mRecyclerview;
     private AdapterUser adapterUser;
     private List<User> userList;
+    private List<Point> scoreList;
     private FirebaseAuth auth;
     private FirebaseUser user;
-    private MaterialButton btnCancel, btnStart, btnNext;
-    private String id_room = "";
-
-    private LinearLayout layoutWait;
     private LinearLayout end_game;
+    private LinearLayout layoutRank;
     private RelativeLayout layoutPlay;
+    private RelativeLayout layoutWait;
     private CountDownTimer count;
     private CountDownTimer downTimer;
     private CountDownTimer postDelay;
-
-    private TextView txtID, txtKeyName, txtRoomName;
-
-    private TextView txtCountDownTime;
+    private TextView txtRoomName;
+    private TextView txtCountNumber;
+    private TextView txtNameTop1;
+    private TextView txtNameTop2;
+    private TextView txtNameTop3;
+    private TextView txtScore1;
+    private TextView txtScore2;
+    private TextView txtScore3;
+    private TextView txtTotal_end;
+    private TextView txtPoint;
+    private TextView txtRank;
+    private ImageButton btnMenu;
+    private ImageButton btnCancel;
+    private MaterialButton btnNext;
+    private MaterialButton btnFinsh_end;
+    private MaterialButton btnOpen;
+    private MaterialButton btnPlay;
+    private MaterialButton btnSharePin;
     private Topic model = new Topic();
+    private Point pt = new Point();
     private int position = 1;
     private int answser = 0;
     private int point = 0;
@@ -76,8 +97,9 @@ public class RoomActivity extends AppCompatActivity {
     private int size = 0;
     private boolean isFinish = false;
     private boolean isKey = false;
-
+    private String id_room = "";
     private GoogleSignInAccount account;
+    private ProgressBar progress_bar;
 
     private DatabaseReference mPoint;
     private TextView txtQuestion, txtAnswerA, txtAnswerB, txtAnswerC, txtAnswerD, txtTotal, txtTime;
@@ -92,10 +114,45 @@ public class RoomActivity extends AppCompatActivity {
         initUtils();
         getDataByFirebase();
         initPlay();
-        actionClick();
+        isClick();
         isStop();
         isCheckPlayer();
 
+
+    }
+
+    private void isRank() {
+        layoutRank.setVisibility(View.VISIBLE);
+        progress_bar.setVisibility(View.INVISIBLE);
+        scoreList = new ArrayList<>();
+        DatabaseReference rank = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("coin");
+        rank.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    Point md = ds.getValue(Point.class);
+                    scoreList.add(md);
+                }
+                Collections.sort(scoreList);
+                if (scoreList.size() > 0) {
+                    txtNameTop1.setText(scoreList.get(0).getName());
+                    txtScore1.setText(scoreList.get(0).getScore());
+                }
+                if (scoreList.size() > 1) {
+                    txtNameTop2.setText(scoreList.get(1).getName());
+                    txtScore2.setText(scoreList.get(1).getScore());
+                }
+                if (scoreList.size() > 2) {
+                    txtNameTop3.setText(scoreList.get(2).getName());
+                    txtScore3.setText(scoreList.get(2).getScore());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
     }
 
@@ -122,7 +179,7 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.child("isStop").getValue().equals("1")) {
-                    Toast.makeText(RoomActivity.this, "End!", Toast.LENGTH_SHORT).show();
+                    isRank();
                 }
             }
 
@@ -134,6 +191,7 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void initPlay() {
+
         mPoint = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("coin").child(user.getUid());
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
         reference.addValueEventListener(new ValueEventListener() {
@@ -146,9 +204,9 @@ public class RoomActivity extends AppCompatActivity {
                                 @SuppressLint("SetTextI18n")
                                 @Override
                                 public void onTick(long millisUntilFinished) {
-                                    txtCountDownTime.setText((int) (millisUntilFinished / 1000) + " sec");
+                                    txtRoomName.setText((int) (millisUntilFinished / 1000) + " sec");
                                     if ((int) (millisUntilFinished / 1000) == 0) {
-                                        txtCountDownTime.setText("Start");
+                                        txtRoomName.setText("Start");
                                     }
                                 }
 
@@ -240,7 +298,10 @@ public class RoomActivity extends AppCompatActivity {
                     }
                 });
             }
-            mPoint.setValue(point);
+            pt.setName(account.getDisplayName());
+            pt.setUid(user.getUid());
+            pt.setScore(String.valueOf(point));
+            mPoint.setValue(pt);
             isFinish = true;
 
         } else {
@@ -331,7 +392,7 @@ public class RoomActivity extends AppCompatActivity {
     }
 
 
-    private void actionClick() {
+    private void isClick() {
 
         layoutA.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -431,6 +492,7 @@ public class RoomActivity extends AppCompatActivity {
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("user");
         reference.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 userList.clear();
@@ -439,7 +501,7 @@ public class RoomActivity extends AppCompatActivity {
                     userList.add(model);
                 }
                 adapterUser.notifyDataSetChanged();
-
+                txtCountNumber.setText(String.valueOf(userList.size()));
             }
 
             @Override
@@ -454,14 +516,7 @@ public class RoomActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void initUtils() {
         id_room = getIntent().getStringExtra("id_room");
-
-        txtID.setText("ID: " + id_room);
-
         account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
-
-        if (account != null) {
-            txtKeyName.setText(account.getDisplayName());
-        }
         userList = new ArrayList<>();
         adapterUser = new AdapterUser(userList);
         mRecyclerview.setHasFixedSize(true);
@@ -476,20 +531,23 @@ public class RoomActivity extends AppCompatActivity {
             public void onSuccess(DataSnapshot dataSnapshot) {
                 if (Objects.requireNonNull(dataSnapshot.child("uid").getValue()).toString().equals(user.getUid())) {
                     isKey = true;
-                    btnCancel.setVisibility(View.VISIBLE);
-                    btnStart.setVisibility(View.VISIBLE);
+                    btnPlay.setVisibility(View.VISIBLE);
+                    btnMenu.setVisibility(View.VISIBLE);
+                    btnOpen.setVisibility(View.VISIBLE);
                 } else {
                     isKey = false;
-                    btnCancel.setVisibility(View.GONE);
-                    btnStart.setVisibility(View.GONE);
+                    btnPlay.setVisibility(View.GONE);
+                    btnMenu.setVisibility(View.GONE);
+                    btnOpen.setVisibility(View.GONE);
                 }
-                txtRoomName.setText("Tên phòng: " + Objects.requireNonNull(dataSnapshot.child("name").getValue()).toString());
+                txtRoomName.setText(Objects.requireNonNull(dataSnapshot.child("name").getValue()).toString());
             }
         });
 
-        btnStart.setOnClickListener(new View.OnClickListener() {
+        btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                btnPlay.setVisibility(View.GONE  );
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("user");
                 reference.addValueEventListener(new ValueEventListener() {
                     @Override
@@ -510,10 +568,23 @@ public class RoomActivity extends AppCompatActivity {
             }
         });
 
-        btnNext.setOnClickListener(new View.OnClickListener() {
+        btnSharePin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(RoomActivity.this);
+                View view = LayoutInflater.from(RoomActivity.this).inflate(R.layout.pin_view, null);
+                TextView txtPin = view.findViewById(R.id.txtPin);
+                txtPin.setText(id_room);
+                builder.setView(view);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
 
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeValue();
             }
         });
 
@@ -521,13 +592,8 @@ public class RoomActivity extends AppCompatActivity {
 
     private void init() {
         mRecyclerview = findViewById(R.id.mRecyclerview);
-        btnCancel = findViewById(R.id.btnCancel);
-        btnStart = findViewById(R.id.btnStart);
         btnNext = findViewById(R.id.btnNext);
-        layoutWait = findViewById(R.id.layoutWait);
         layoutPlay = findViewById(R.id.layoutPlay);
-        txtCountDownTime = findViewById(R.id.txtCountDownTime);
-
         txtQuestion = findViewById(R.id.txtQuestion);
         txtAnswerA = findViewById(R.id.txtAnswerA);
         txtAnswerB = findViewById(R.id.txtAnswerB);
@@ -540,10 +606,27 @@ public class RoomActivity extends AppCompatActivity {
         layoutC = findViewById(R.id.layoutC);
         layoutD = findViewById(R.id.layoutD);
         end_game = findViewById(R.id.end_game);
-
-        txtID = findViewById(R.id.txtID);
-        txtKeyName = findViewById(R.id.txtKeyName);
         txtRoomName = findViewById(R.id.txtRoomName);
+        layoutWait = findViewById(R.id.layoutWait);
+        btnPlay = findViewById(R.id.btnPlay);
+        btnMenu = findViewById(R.id.btnMenu);
+        btnCancel = findViewById(R.id.btnCancel);
+        txtCountNumber = findViewById(R.id.txtCountNumber);
+        btnSharePin = findViewById(R.id.btnSharePin);
+        txtNameTop1 = findViewById(R.id.txtNameTop1);
+        txtNameTop2 = findViewById(R.id.txtNameTop2);
+        txtNameTop3 = findViewById(R.id.txtNameTop3);
+        txtScore1 = findViewById(R.id.txtScore1);
+        txtScore2 = findViewById(R.id.txtScore2);
+        txtScore3 = findViewById(R.id.txtScore3);
+        txtTotal_end = findViewById(R.id.txtTotal_end);
+        txtPoint = findViewById(R.id.txtPoint);
+        txtRank = findViewById(R.id.txtRank);
+        layoutRank = findViewById(R.id.layoutRank);
+        btnFinsh_end = findViewById(R.id.btnFinish_end);
+        btnOpen = findViewById(R.id.btnOpen);
+        progress_bar = findViewById(R.id.progress_bar);
+
 
     }
 
@@ -585,6 +668,7 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NotNull DatabaseError databaseError) {
                 Log.e("TAG", "onCancelled", databaseError.toException());
+                finish();
             }
         });
 
