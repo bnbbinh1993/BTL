@@ -9,49 +9,54 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="160dp"
         android:layout_gravity="center"
-        android:background="@drawable/bg_1"
-        android:orientation="vertical"
-        android:padding="30dp">
+        android:orientation="vertical">
 
-        <LinearLayout
+        <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_toStartOf="@+id/mAvatar"
-            android:orientation="vertical">
+            android:background="@drawable/ic_wave_top" />
 
-            <TextView
-                android:id="@+id/txtName"
-                style="@style/TXT"
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="10dp">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:textColor="@color/white"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                tools:ignore="HardcodedText" />
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="20dp">
 
-            <TextView
-                style="@style/TXT"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Welcome to PTIT"
-                android:textColor="@color/white"
-                tools:ignore="HardcodedText" />
-        </LinearLayout>
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/mAvatar"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="10dp"
-            app:civ_border_color="@color/white"
-            app:civ_border_overlay="true"
-            app:civ_border_width="1dp"
-            app:civ_circle_background_color="@color/white" />
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/mAvatar"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    app:civ_border_color="@color/app"
+                    app:civ_border_overlay="true"
+                    app:civ_border_width="1dp"
+                    app:civ_circle_background_color="@color/white" />
+
+                <TextView
+                    android:id="@+id/txtName"
+                    style="@style/TXT"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:maxLines="1"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
     </RelativeLayout>
 
@@ -149,7 +154,7 @@
 
     <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
         android:src="@mipmap/ptit_2" />
 
     <TextView
@@ -166,195 +171,11 @@
         android:visibility="gone"
         tools:ignore="HardcodedText" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:visibility="gone">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:paddingTop="30dp">
-
-            <ImageView
-                android:id="@+id/top2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_top2" />
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/imageTop2"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@mipmap/demo"
-                app:civ_border_color="@color/app"
-                app:civ_border_width="2dp" />
-
-            <TextView
-                style="@style/TXT"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingStart="10dp"
-                android:paddingTop="5dp"
-                android:paddingEnd="10dp"
-                android:text="Bình"
-                android:textColor="@color/app"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="15dp"
-                    android:padding="2dp"
-                    android:src="@drawable/ic_coin" />
-
-                <TextView
-                    style="@style/TXT"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="1000"
-                    android:textAlignment="center"
-                    android:textColor="@color/app"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:id="@+id/top1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_top1" />
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/imageTop1"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:src="@mipmap/demo"
-                app:civ_border_color="@color/app"
-                app:civ_border_width="2dp" />
-
-            <TextView
-                style="@style/TXT"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingStart="10dp"
-                android:paddingTop="5dp"
-                android:paddingEnd="10dp"
-                android:text="Bình"
-                android:textColor="@color/app"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="15dp"
-                android:padding="2dp"
-                android:src="@drawable/ic_coin" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    style="@style/TXT"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="1000"
-                    android:textAlignment="center"
-                    android:textColor="@color/app"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:paddingTop="30dp">
-
-            <ImageView
-                android:id="@+id/top3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_top3" />
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/imageTop3"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@mipmap/demo"
-                app:civ_border_color="@color/app"
-                app:civ_border_width="2dp" />
-
-            <TextView
-                style="@style/TXT"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingStart="10dp"
-                android:paddingTop="5dp"
-                android:paddingEnd="10dp"
-                android:text="Bình"
-                android:textColor="@color/app"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="15dp"
-                    android:padding="2dp"
-                    android:src="@drawable/ic_coin" />
-
-                <TextView
-                    style="@style/TXT"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="1000"
-                    android:textAlignment="center"
-                    android:textColor="@color/app"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/ic_wave_bottom"
         android:orientation="vertical">
 
         <TextView
@@ -365,7 +186,7 @@
             android:gravity="bottom|center"
             android:padding="10dp"
             android:text="Copyright to PTIT"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textStyle="italic"
             tools:ignore="HardcodedText" />
     </LinearLayout>

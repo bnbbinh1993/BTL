@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             String personId = acct.getId();
             Uri personPhoto = acct.getPhotoUrl();
 
-            String a = "<p>Hello<b> <font color ='red'>" + personName + "</color></b></p>";
+            String a = "<p><b>Hello!   <font color ='red'>" + personName + "</color></b></p>";
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 txtName.setText(Html.fromHtml(a, Html.FROM_HTML_MODE_LEGACY));
             } else {

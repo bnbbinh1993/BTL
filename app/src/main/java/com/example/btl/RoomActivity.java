@@ -643,6 +643,7 @@ public class RoomActivity extends AppCompatActivity {
                         builder.setView(view);
                         AlertDialog dialog = builder.create();
                         dialog.show();
+
                         ct = new CountDownTimer(11000, 1000) {
                             @SuppressLint("SetTextI18n")
                             @Override
@@ -681,7 +682,7 @@ public class RoomActivity extends AppCompatActivity {
                                     ct = null;
                                 }
                             }
-                        };
+                        }.start();
                     }
 
                 }

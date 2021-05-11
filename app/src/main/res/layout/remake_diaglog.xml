@@ -1,38 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:background="@drawable/bg_5"
     android:gravity="center"
-    android:orientation="vertical"
-    android:padding="40dp">
+    android:orientation="vertical">
 
-    <TextView
-        style="@style/TXT"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:text="Re-creating rooms, please wait!"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        tools:ignore="HardcodedText" />
+        android:background="#9458FF"
+        android:orientation="vertical"
+        android:padding="40dp">
 
-    <TextView
-        android:id="@+id/txtTimeRestart"
-        style="@style/TXT"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:text="12s"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        tools:ignore="HardcodedText" />
-</LinearLayout>
+        <TextView
+            style="@style/TXT"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="Re-creating rooms, please wait!"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/txtTimeRestart"
+            style="@style/TXT"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            tools:ignore="HardcodedText" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

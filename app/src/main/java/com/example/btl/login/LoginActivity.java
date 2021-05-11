@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.btl.MainActivity;
@@ -38,6 +39,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
     private GoogleSignInClient googleSignInClient;
@@ -59,8 +61,8 @@ public class LoginActivity extends AppCompatActivity {
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
 
         auth = FirebaseAuth.getInstance();
-        MaterialButton btnGG = findViewById(R.id.btnGG);
-        btnGG.setOnClickListener(new View.OnClickListener() {
+        ImageButton gg = findViewById(R.id.imageTop);
+        gg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = googleSignInClient.getSignInIntent();
@@ -95,7 +97,7 @@ public class LoginActivity extends AppCompatActivity {
         auth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()){
+                if (task.isSuccessful()) {
                     UpdateData(inAccount);
                 }
             }
@@ -119,7 +121,7 @@ public class LoginActivity extends AppCompatActivity {
         map.put("personId", inAccount.getId());
 
 
-        reference.child("User").child(user.getUid()).setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+        reference.child("User").child(Objects.requireNonNull(user).getUid()).setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Toast.makeText(LoginActivity.this, "onSuccess!", Toast.LENGTH_SHORT).show();
@@ -181,7 +183,7 @@ public class LoginActivity extends AppCompatActivity {
 //                        }
 //                    });
 
-        }
     }
+}
 
 

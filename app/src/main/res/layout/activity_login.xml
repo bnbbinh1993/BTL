@@ -9,31 +9,60 @@
     android:orientation="vertical"
     tools:context=".login.LoginActivity">
 
-    <ImageView
+    <ImageButton
         android:id="@+id/imageTop"
         android:layout_width="70dp"
         android:layout_height="70dp"
+        android:layout_above="@+id/btnGG"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"
-        android:src="@drawable/ic_google" />
+        android:background="@drawable/ic_google"
+        tools:ignore="ContentDescription" />
+
 
     <TextView
-        style="@style/TXT"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/imageTop"
-        android:padding="10dp"
-        android:text="Welcome to Google Sigin"
-        android:textAlignment="center"
-        tools:ignore="HardcodedText" />
-
-    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnGG"
+        style="@style/TXT"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:drawableStart="@drawable/googleg_standard_color_18"
-        android:text="Login by google"
+        android:padding="10dp"
+        android:text="Sign in with google"
+        android:textAllCaps="false"
         tools:ignore="HardcodedText" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/viewbottom"
+        android:gravity="center"
+        android:text="_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
+        tools:ignore="HardcodedText" />
+
+    <LinearLayout
+        android:id="@+id/viewbottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="30dp"
+            android:layout_margin="5dp"
+            android:background="@mipmap/dss"
+            android:scaleType="centerCrop" />
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="5dp"
+            android:background="@mipmap/ssl"
+            android:scaleType="centerCrop" />
+
+
+    </LinearLayout>
 
 </RelativeLayout>
