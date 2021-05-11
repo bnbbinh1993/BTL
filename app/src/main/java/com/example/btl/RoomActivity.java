@@ -13,13 +13,11 @@ import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.btl.adapter.AdapterUser;
 import com.example.btl.model.Point;
@@ -43,17 +41,12 @@ import com.google.firebase.database.ValueEventListener;
 import org.jetbrains.annotations.NotNull;
 
 
-import java.sql.Time;
 import java.util.ArrayList;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
-import java.util.Map;
 import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
 
 
 public class RoomActivity extends AppCompatActivity {
@@ -61,15 +54,18 @@ public class RoomActivity extends AppCompatActivity {
     private AdapterUser adapterUser;
     private List<User> userList;
     private List<Point> scoreList;
-    private FirebaseAuth auth;
     private FirebaseUser user;
     private LinearLayout end_game;
     private LinearLayout layoutRank;
     private RelativeLayout layoutPlay;
     private RelativeLayout layoutWait;
+    private RelativeLayout rl1;
+    private RelativeLayout rl2;
+    private RelativeLayout rl3;
     private CountDownTimer count;
     private CountDownTimer downTimer;
     private CountDownTimer postDelay;
+    private CountDownTimer ct;
     private TextView txtRoomName;
     private TextView txtCountNumber;
     private TextView txtNameTop1;
@@ -78,25 +74,25 @@ public class RoomActivity extends AppCompatActivity {
     private TextView txtScore1;
     private TextView txtScore2;
     private TextView txtScore3;
-    private TextView txtTotal_end;
     private TextView txtPoint;
     private TextView txtRank;
     private ImageButton btnMenu;
     private ImageButton btnCancel;
     private MaterialButton btnNext;
-    private MaterialButton btnFinsh_end;
+    private MaterialButton benFinish_end;
     private MaterialButton btnOpen;
     private MaterialButton btnPlay;
     private MaterialButton btnSharePin;
     private Topic model = new Topic();
-    private Point pt = new Point();
+    private final Point pt = new Point();
     private int position = 1;
-    private int answser = 0;
+    private int answer = 0;
     private int point = 0;
     private long keyTime = 1000;
     private int size = 0;
     private boolean isFinish = false;
     private boolean isKey = false;
+    private boolean isRestart = false;
     private String id_room = "";
     private GoogleSignInAccount account;
     private ProgressBar progress_bar;
@@ -117,6 +113,7 @@ public class RoomActivity extends AppCompatActivity {
         isClick();
         isStop();
         isCheckPlayer();
+        clear();
 
 
     }
@@ -127,6 +124,7 @@ public class RoomActivity extends AppCompatActivity {
         scoreList = new ArrayList<>();
         DatabaseReference rank = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("coin");
         rank.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot ds : snapshot.getChildren()) {
@@ -134,18 +132,39 @@ public class RoomActivity extends AppCompatActivity {
                     scoreList.add(md);
                 }
                 Collections.sort(scoreList);
+
+                for (int i = 0; i < scoreList.size(); i++) {
+                    if (user.getUid().equals(scoreList.get(i).getUid())) {
+                        txtRank.setText("Ranking: " + (i + 1));
+                        return;
+                    }
+                }
+
                 if (scoreList.size() > 0) {
+                    rl1.setVisibility(View.VISIBLE);
+                    rl2.setVisibility(View.GONE);
+                    rl3.setVisibility(View.GONE);
                     txtNameTop1.setText(scoreList.get(0).getName());
                     txtScore1.setText(scoreList.get(0).getScore());
+
                 }
                 if (scoreList.size() > 1) {
+                    rl1.setVisibility(View.VISIBLE);
+                    rl2.setVisibility(View.VISIBLE);
+                    rl3.setVisibility(View.GONE);
                     txtNameTop2.setText(scoreList.get(1).getName());
                     txtScore2.setText(scoreList.get(1).getScore());
+
                 }
                 if (scoreList.size() > 2) {
+                    rl1.setVisibility(View.VISIBLE);
+                    rl2.setVisibility(View.VISIBLE);
+                    rl3.setVisibility(View.VISIBLE);
                     txtNameTop3.setText(scoreList.get(2).getName());
                     txtScore3.setText(scoreList.get(2).getScore());
                 }
+
+
             }
 
             @Override
@@ -161,7 +180,7 @@ public class RoomActivity extends AppCompatActivity {
         isStop.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (Integer.parseInt(snapshot.child("isCheck").getValue().toString()) >= Integer.parseInt(snapshot.child("isCount").getValue().toString())) {
+                if (Integer.parseInt(Objects.requireNonNull(snapshot.child("isCheck").getValue()).toString()) >= Integer.parseInt(snapshot.child("isCount").getValue().toString())) {
                     isStop.child("isStop").setValue("1");
                 }
             }
@@ -178,7 +197,7 @@ public class RoomActivity extends AppCompatActivity {
         isStop.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.child("isStop").getValue().equals("1")) {
+                if (Objects.equals(snapshot.child("isStop").getValue(), "1")) {
                     isRank();
                 }
             }
@@ -226,9 +245,8 @@ public class RoomActivity extends AppCompatActivity {
                         } else {
                             showStop();
                         }
-                    } else {
-                        // chưa làm gì cả bình tĩnh
                     }
+
                 }
 
             }
@@ -267,7 +285,7 @@ public class RoomActivity extends AppCompatActivity {
         reference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
-                String id_question = Objects.requireNonNull(task.getResult().child("topic").getValue()).toString();
+                String id_question = Objects.requireNonNull(Objects.requireNonNull(task.getResult()).child("topic").getValue()).toString();
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("topic").child(id_question);
                 reference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
                     @Override
@@ -292,12 +310,15 @@ public class RoomActivity extends AppCompatActivity {
                 isCheck.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DataSnapshot> task) {
-                        int p = Integer.parseInt(task.getResult().getValue().toString());
+                        int p = Integer.parseInt(Objects.requireNonNull(Objects.requireNonNull(task.getResult()).getValue()).toString());
                         p++;
                         isCheck.setValue(String.valueOf(p));
                     }
                 });
             }
+
+            txtPoint.setText("Total score: " + point);
+
             pt.setName(account.getDisplayName());
             pt.setUid(user.getUid());
             pt.setScore(String.valueOf(point));
@@ -321,7 +342,7 @@ public class RoomActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void isPlay() {
-
+        isRestart = false;
         resetUI();
         updateUI();
 
@@ -401,7 +422,7 @@ public class RoomActivity extends AppCompatActivity {
                 layoutB.setBackgroundResource(R.color.test_1);
                 layoutC.setBackgroundResource(R.color.test_1);
                 layoutD.setBackgroundResource(R.color.test_1);
-                answser = 1;
+                answer = 1;
             }
         });
         layoutB.setOnClickListener(new View.OnClickListener() {
@@ -411,7 +432,7 @@ public class RoomActivity extends AppCompatActivity {
                 layoutB.setBackgroundResource(R.color.btnB);
                 layoutC.setBackgroundResource(R.color.test_1);
                 layoutD.setBackgroundResource(R.color.test_1);
-                answser = 2;
+                answer = 2;
 
             }
         });
@@ -422,7 +443,7 @@ public class RoomActivity extends AppCompatActivity {
                 layoutB.setBackgroundResource(R.color.test_1);
                 layoutC.setBackgroundResource(R.color.btnC);
                 layoutD.setBackgroundResource(R.color.test_1);
-                answser = 3;
+                answer = 3;
             }
         });
         layoutD.setOnClickListener(new View.OnClickListener() {
@@ -432,7 +453,7 @@ public class RoomActivity extends AppCompatActivity {
                 layoutB.setBackgroundResource(R.color.test_1);
                 layoutC.setBackgroundResource(R.color.test_1);
                 layoutD.setBackgroundResource(R.color.btnD);
-                answser = 4;
+                answer = 4;
             }
         });
 
@@ -441,7 +462,7 @@ public class RoomActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void checkAnwser() {
         lock();
-        if (answser == model.getQuestion().get(position).getAnswerTrue()) {
+        if (answer == model.getQuestion().get(position).getAnswerTrue()) {
             point += 100;
         }
         switch (model.getQuestion().get(position).getAnswerTrue()) {
@@ -522,7 +543,7 @@ public class RoomActivity extends AppCompatActivity {
         mRecyclerview.setHasFixedSize(true);
         mRecyclerview.setLayoutManager(new GridLayoutManager(this, 6));
         mRecyclerview.setAdapter(adapterUser);
-        auth = FirebaseAuth.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
@@ -581,7 +602,7 @@ public class RoomActivity extends AppCompatActivity {
             }
         });
 
-        btnFinsh_end.setOnClickListener(new View.OnClickListener() {
+        benFinish_end.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 removeValue();
@@ -592,6 +613,83 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 removeValue();
+            }
+        });
+
+        btnOpen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference dt = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isRestart");
+                dt.setValue("1");
+
+            }
+        });
+
+
+    }
+
+    private void clear() {
+
+        DatabaseReference cl = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isRestart");
+        cl.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (Objects.equals(snapshot.getValue(), "1")) {
+                    if (!isRestart) {
+                        isRestart = true;
+                        AlertDialog.Builder builder = new AlertDialog.Builder(RoomActivity.this);
+                        View view = LayoutInflater.from(RoomActivity.this).inflate(R.layout.remake_diaglog, null);
+                        TextView txtTm = view.findViewById(R.id.txtTimeRestart);
+                        builder.setView(view);
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                        ct = new CountDownTimer(11000, 1000) {
+                            @SuppressLint("SetTextI18n")
+                            @Override
+                            public void onTick(long millisUntilFinished) {
+                                txtTm.setText(millisUntilFinished / 1000 + "s");
+                            }
+
+                            @Override
+                            public void onFinish() {
+                                if (isKey) {
+                                    DatabaseReference rs1 = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
+                                    rs1.child("isPlay").setValue("0");
+                                    rs1.child("isStop").setValue("0");
+                                    rs1.child("isRestart").setValue("0");
+                                    rs1.child("isCheck").setValue("0");
+                                    Query aa = rs1.child("room").child(id_room).child("coin");
+                                    aa.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NotNull DataSnapshot a) {
+                                            for (DataSnapshot appleSnapshot : a.getChildren()) {
+                                                appleSnapshot.getRef().removeValue();
+                                            }
+
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NotNull DatabaseError databaseError) {
+                                            Log.e("TAG", "onCancelled", databaseError.toException());
+                                        }
+                                    });
+                                } else {
+
+                                }
+                                if (ct != null) {
+                                    ct.cancel();
+                                    ct = null;
+                                }
+                            }
+                        };
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
 
@@ -626,13 +724,15 @@ public class RoomActivity extends AppCompatActivity {
         txtScore1 = findViewById(R.id.txtScore1);
         txtScore2 = findViewById(R.id.txtScore2);
         txtScore3 = findViewById(R.id.txtScore3);
-        txtTotal_end = findViewById(R.id.txtTotal_end);
         txtPoint = findViewById(R.id.txtPoint);
         txtRank = findViewById(R.id.txtRank);
         layoutRank = findViewById(R.id.layoutRank);
-        btnFinsh_end = findViewById(R.id.btnFinish_end);
+        benFinish_end = findViewById(R.id.btnFinish_end);
         btnOpen = findViewById(R.id.btnOpen);
         progress_bar = findViewById(R.id.progress_bar);
+        rl1 = findViewById(R.id.rl1);
+        rl2 = findViewById(R.id.rl2);
+        rl3 = findViewById(R.id.rl3);
 
 
     }

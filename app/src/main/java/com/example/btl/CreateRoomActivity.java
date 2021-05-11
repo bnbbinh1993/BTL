@@ -40,7 +40,6 @@ public class CreateRoomActivity extends AppCompatActivity {
     private EditText timeTest;
     private MaterialButton btnCreate;
     private GoogleSignInAccount account;
-    private FirebaseAuth auth;
     private FirebaseUser user;
 
     @Override
@@ -60,7 +59,7 @@ public class CreateRoomActivity extends AppCompatActivity {
         if (intent != null) {
             topicId.setText(intent.getStringExtra("_topic_id"));
         }
-        auth = FirebaseAuth.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         btnCreate.setOnClickListener(new View.OnClickListener() {

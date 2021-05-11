@@ -29,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
     private MaterialCardView btnTopic;
     private MaterialCardView btnRoom;
     private GoogleSignInClient mGoogleSignInClient;
-    private FirebaseAuth auth;
     private GoogleSignInAccount acct;
     private TextView txtName;
     private CircleImageView mAvatar;
@@ -106,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
-        auth = FirebaseAuth.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
 
     }
 

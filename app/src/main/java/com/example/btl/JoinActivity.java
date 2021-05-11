@@ -54,7 +54,7 @@ public class JoinActivity extends AppCompatActivity {
     private RecyclerView mRecyclerview;
     private AdapterRoom adapterRoom;
     private ProgressBar progress_bar;
-    private List<Room> roomList = new ArrayList<>();
+    private final List<Room> roomList = new ArrayList<>();
     private GoogleSignInAccount account;
     private FirebaseAuth auth;
     private FirebaseUser user;

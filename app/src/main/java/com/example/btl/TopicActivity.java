@@ -40,7 +40,7 @@ public class TopicActivity extends AppCompatActivity {
     private GoogleSignInAccount acct;
     private RecyclerView recyclerView;
     private AdapterTopic adapterTopic;
-    private List<Topic> topicList = new ArrayList<>();
+    private final List<Topic> topicList = new ArrayList<>();
     private ProgressBar progress_bar;
 
 

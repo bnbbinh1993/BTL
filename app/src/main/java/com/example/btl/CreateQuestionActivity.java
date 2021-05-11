@@ -43,7 +43,7 @@ public class CreateQuestionActivity extends AppCompatActivity {
     private MaterialCardView cardQuestion;
     private RecyclerView mRecyclerview;
     private AdapterQuestion adapterQuestion;
-    private List<QS> list = new ArrayList<>();
+    private final List<QS> list = new ArrayList<>();
     private RadioButton btnA;
     private RadioButton btnB;
     private RadioButton btnC;
