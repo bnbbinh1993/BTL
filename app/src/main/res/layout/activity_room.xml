@@ -35,6 +35,7 @@
                     android:src="@mipmap/demo" />
 
                 <TextView
+                    android:id="@+id/txtKeyName"
                     style="@style/TXT"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -52,6 +53,28 @@
                     android:textColor="@color/white"
                     android:textSize="10sp"
                     tools:ignore="HardcodedText,SmallSp" />
+
+                <TextView
+                    android:id="@+id/txtID"
+                    style="@style/TXT"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="ID"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    tools:ignore="HardcodedText,SmallSp" />
+                <TextView
+                    android:id="@+id/txtRoomName"
+                    style="@style/TXT"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="ID"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    tools:ignore="HardcodedText,SmallSp" />
+
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
@@ -87,7 +110,8 @@
             android:text="Waiting..."
             android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="40sp" />
+            android:textSize="40sp"
+            tools:ignore="HardcodedText" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/mRecyclerview"

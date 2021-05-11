@@ -8,6 +8,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -36,6 +37,7 @@ public class TestActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseUser user;
     private MaterialButton btnNext;
+    private MaterialButton btnFinish;
     private Topic model = new Topic();
     private int position = 1;
     private int size = 0;
@@ -43,6 +45,7 @@ public class TestActivity extends AppCompatActivity {
     private TextView txtQuestion, txtAnswerA, txtAnswerB, txtAnswerC, txtAnswerD, txtTotal, txtTime;
     private LinearLayout layoutA, layoutB, layoutC, layoutD;
     private CountDownTimer downTimer;
+    private CountDownTimer postDelay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +61,7 @@ public class TestActivity extends AppCompatActivity {
         if (intent != null) {
             String id_topic = intent.getStringExtra("_topic_id");
             showPlay(id_topic);
+
         }
     }
 
@@ -78,12 +82,31 @@ public class TestActivity extends AppCompatActivity {
     }
 
     private void setPostDelay() {
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        btnNext.setVisibility(View.VISIBLE);
+        lock();
+        checkAnwser();
+        postDelay = new CountDownTimer(2000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                if (position > size) {
+                    btnNext.setVisibility(View.GONE);
+                    btnFinish.setVisibility(View.VISIBLE);
+                } else {
+                    btnNext.setVisibility(View.VISIBLE);
+                    btnFinish.setVisibility(View.GONE);
+                }
+                if (postDelay != null) {
+                    postDelay.cancel();
+                    postDelay = null;
+                }
+            }
+        }.start();
+
+
     }
 
     @SuppressLint("SetTextI18n")
@@ -95,20 +118,15 @@ public class TestActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void updateUI() {
-        if (position > size) {
-            Toast.makeText(this, "End Game!", Toast.LENGTH_SHORT).show();
-        } else {
-            txtTotal.setText(position + "/" + size);
-            txtQuestion.setText(model.getQuestion().get(position).getTxtQuestion());
-            txtAnswerA.setText(model.getQuestion().get(position).getAnswerA());
-            txtAnswerB.setText(model.getQuestion().get(position).getAnswerB());
-            txtAnswerC.setText(model.getQuestion().get(position).getAnswerC());
-            txtAnswerD.setText(model.getQuestion().get(position).getAnswerD());
-            keyTime = Long.parseLong(model.getQuestion().get(position).getTime());
-            unLock();
-            countdown();
-        }
-
+        txtTotal.setText(position + "/" + size);
+        txtQuestion.setText(model.getQuestion().get(position).getTxtQuestion());
+        txtAnswerA.setText(model.getQuestion().get(position).getAnswerA());
+        txtAnswerB.setText(model.getQuestion().get(position).getAnswerB());
+        txtAnswerC.setText(model.getQuestion().get(position).getAnswerC());
+        txtAnswerD.setText(model.getQuestion().get(position).getAnswerD());
+        keyTime = Long.parseLong(model.getQuestion().get(position).getTime());
+        unLock();
+        countdown();
 
     }
 
@@ -121,18 +139,16 @@ public class TestActivity extends AppCompatActivity {
 
                 if ((int) (millisUntilFinished / 1000 - 1) <= 0) {
                     txtTime.setText("0 sec");
+
                 } else {
                     txtTime.setText((int) (millisUntilFinished / 1000 - 1) + " sec");
                 }
 
-                if (millisUntilFinished / 1000 == 0) {
-                    lock();
-                    checkAnwser();
-                }
             }
 
             @Override
             public void onFinish() {
+
                 stopCountdown();
                 setPostDelay();
 
@@ -180,6 +196,10 @@ public class TestActivity extends AppCompatActivity {
                 layoutB.setBackgroundResource(R.color.test_1);
                 layoutC.setBackgroundResource(R.color.test_1);
                 layoutD.setBackgroundResource(R.color.test_1);
+
+                stopCountdown();
+                setPostDelay();
+
             }
         });
         layoutB.setOnClickListener(new View.OnClickListener() {
@@ -189,6 +209,9 @@ public class TestActivity extends AppCompatActivity {
                 layoutB.setBackgroundResource(R.color.btnB);
                 layoutC.setBackgroundResource(R.color.test_1);
                 layoutD.setBackgroundResource(R.color.test_1);
+
+                stopCountdown();
+                setPostDelay();
             }
         });
         layoutC.setOnClickListener(new View.OnClickListener() {
@@ -198,6 +221,9 @@ public class TestActivity extends AppCompatActivity {
                 layoutB.setBackgroundResource(R.color.test_1);
                 layoutC.setBackgroundResource(R.color.btnC);
                 layoutD.setBackgroundResource(R.color.test_1);
+
+                stopCountdown();
+                setPostDelay();
             }
         });
         layoutD.setOnClickListener(new View.OnClickListener() {
@@ -207,6 +233,10 @@ public class TestActivity extends AppCompatActivity {
                 layoutB.setBackgroundResource(R.color.test_1);
                 layoutC.setBackgroundResource(R.color.test_1);
                 layoutD.setBackgroundResource(R.color.btnD);
+
+                stopCountdown();
+                setPostDelay();
+
             }
         });
 
@@ -214,8 +244,14 @@ public class TestActivity extends AppCompatActivity {
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                position++;
                 isPlay();
+            }
+        });
+
+        btnFinish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
             }
         });
 
@@ -223,7 +259,6 @@ public class TestActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void checkAnwser() {
-
 
         switch (model.getQuestion().get(position).getAnswerTrue()) {
             case 1: {
@@ -256,13 +291,14 @@ public class TestActivity extends AppCompatActivity {
             }
         }
 
-
+        position++;
     }
 
 
     private void init() {
 
         btnNext = findViewById(R.id.btnNext);
+        btnFinish = findViewById(R.id.btnFinish);
         txtQuestion = findViewById(R.id.txtQuestion);
         txtAnswerA = findViewById(R.id.txtAnswerA);
         txtAnswerB = findViewById(R.id.txtAnswerB);

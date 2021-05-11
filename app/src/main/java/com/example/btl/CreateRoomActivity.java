@@ -56,15 +56,12 @@ public class CreateRoomActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setTitle("Create room");
-
         Intent intent = getIntent();
         if (intent != null) {
             topicId.setText(intent.getStringExtra("_topic_id"));
         }
-
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
-
         account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         btnCreate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,7 +117,7 @@ public class CreateRoomActivity extends AppCompatActivity {
                                                 if (dataSnapshot != null) {
                                                     String id = "";
                                                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                                                        id = ds.child("id").getValue().toString();
+                                                        id = Objects.requireNonNull(ds.child("id").getValue()).toString();
                                                     }
                                                     if (user != null) {
                                                         Map<String, String> map = new HashMap<>();
@@ -131,13 +128,19 @@ public class CreateRoomActivity extends AppCompatActivity {
                                                         map.put("time", time);
                                                         map.put("id", String.valueOf(Integer.parseInt(id) + 1));
                                                         map.put("isPlay", "0");
+                                                        map.put("isCount", "1");
+                                                        map.put("isCheck", "0");
                                                         map.put("isStop", "0");
                                                         map.put("author", account.getDisplayName());
+                                                        int key = Integer.parseInt(id) + 1;
                                                         reference.child("room").child(String.valueOf(Integer.parseInt(id) + 1)).setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                             @Override
                                                             public void onSuccess(Void aVoid) {
-                                                                Toast.makeText(CreateRoomActivity.this, "isSuccessful!", Toast.LENGTH_SHORT).show();
+                                                                Intent intent = new Intent(CreateRoomActivity.this, RoomActivity.class);
+                                                                intent.putExtra("id_room", String.valueOf(key));
                                                                 finish();
+                                                                startActivity(intent);
+                                                                Toast.makeText(CreateRoomActivity.this, "isSuccessful!", Toast.LENGTH_SHORT).show();
                                                             }
                                                         }).addOnFailureListener(new OnFailureListener() {
                                                             @Override
@@ -148,10 +151,7 @@ public class CreateRoomActivity extends AppCompatActivity {
                                                     } else {
                                                         Toast.makeText(CreateRoomActivity.this, "Error!", Toast.LENGTH_SHORT).show();
                                                     }
-
                                                 }
-
-
                                             }
                                         }).addOnFailureListener(new OnFailureListener() {
                                             @Override
@@ -159,7 +159,6 @@ public class CreateRoomActivity extends AppCompatActivity {
                                                 Toast.makeText(CreateRoomActivity.this, "Error!", Toast.LENGTH_SHORT).show();
                                             }
                                         });
-
 
                                     } else {
                                         if (user != null) {
@@ -170,12 +169,18 @@ public class CreateRoomActivity extends AppCompatActivity {
                                             map.put("topic", topic);
                                             map.put("time", time);
                                             map.put("id", "1000");
+                                            map.put("isCount", "1");
+                                            map.put("isCheck", "0");
                                             map.put("isPlay", "0");
                                             map.put("isStop", "0");
                                             map.put("author", account.getDisplayName());
                                             reference.child("room").child("1000").setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
+                                                    Intent intent = new Intent(CreateRoomActivity.this, RoomActivity.class);
+                                                    intent.putExtra("id_room", "1000");
+                                                    finish();
+                                                    startActivity(intent);
                                                     Toast.makeText(CreateRoomActivity.this, "isSuccessful!", Toast.LENGTH_SHORT).show();
                                                 }
                                             }).addOnFailureListener(new OnFailureListener() {

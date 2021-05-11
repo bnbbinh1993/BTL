@@ -129,7 +129,6 @@ public class CreateQuestionActivity extends AppCompatActivity {
                             descriptions.requestFocus();
                             progressDialog.dismiss();
                         } else {
-
                             map.put("name", name);
                             map.put("descriptions", des);
                             map.put("id", String.valueOf(id));
@@ -160,10 +159,7 @@ public class CreateQuestionActivity extends AppCompatActivity {
                                     progressDialog.dismiss();
                                 }
                             });
-
                         }
-
-
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -172,7 +168,6 @@ public class CreateQuestionActivity extends AppCompatActivity {
                         progressDialog.dismiss();
                     }
                 });
-
 
             }
         });

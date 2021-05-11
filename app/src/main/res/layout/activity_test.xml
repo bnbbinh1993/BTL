@@ -262,6 +262,8 @@
     </LinearLayout>
 
     <LinearLayout
+
+        android:gravity="center"
         android:id="@+id/layoutbottom"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -275,6 +277,15 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:text="NEXT"
+            android:visibility="gone"
+            tools:ignore="HardcodedText" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFinish"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="Finish"
             android:visibility="gone"
             tools:ignore="HardcodedText" />
     </LinearLayout>

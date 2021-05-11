@@ -1,4 +1,4 @@
-  package com.example.btl;
+package com.example.btl;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +19,8 @@ import android.widget.Toast;
 import com.example.btl.adapter.AdapterUser;
 import com.example.btl.model.Topic;
 import com.example.btl.model.User;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -61,6 +63,9 @@ public class RoomActivity extends AppCompatActivity {
     private RelativeLayout layoutPlay;
     private CountDownTimer count;
     private CountDownTimer downTimer;
+    private CountDownTimer postDelay;
+
+    private TextView txtID, txtKeyName, txtRoomName;
 
     private TextView txtCountDownTime;
     private Topic model = new Topic();
@@ -69,6 +74,10 @@ public class RoomActivity extends AppCompatActivity {
     private int point = 0;
     private long keyTime = 1000;
     private int size = 0;
+    private boolean isFinish = false;
+    private boolean isKey = false;
+
+    private GoogleSignInAccount account;
 
     private DatabaseReference mPoint;
     private TextView txtQuestion, txtAnswerA, txtAnswerB, txtAnswerC, txtAnswerD, txtTotal, txtTime;
@@ -84,8 +93,44 @@ public class RoomActivity extends AppCompatActivity {
         getDataByFirebase();
         initPlay();
         actionClick();
+        isStop();
+        isCheckPlayer();
 
 
+    }
+
+    private void isCheckPlayer() {
+        DatabaseReference isStop = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
+        isStop.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (Integer.parseInt(snapshot.child("isCheck").getValue().toString()) >= Integer.parseInt(snapshot.child("isCount").getValue().toString())) {
+                    isStop.child("isStop").setValue("1");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void isStop() {
+        DatabaseReference isStop = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
+        isStop.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.child("isStop").getValue().equals("1")) {
+                    Toast.makeText(RoomActivity.this, "End!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void initPlay() {
@@ -94,31 +139,40 @@ public class RoomActivity extends AppCompatActivity {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (Objects.requireNonNull(snapshot.child("isPlay").getValue()).toString().equals("1")) {
-                    if (Objects.requireNonNull(snapshot.child("isStop").getValue()).toString().equals("0")) {
-                        count = new CountDownTimer(4000, 1000) {
-                            @SuppressLint("SetTextI18n")
-                            @Override
-                            public void onTick(long millisUntilFinished) {
-                                txtCountDownTime.setText((int) (millisUntilFinished / 1000) + " sec");
-                                if ((int) (millisUntilFinished / 1000) == 0) {
-                                    txtCountDownTime.setText("Start");
+                if (!isFinish) {
+                    if (Objects.requireNonNull(snapshot.child("isPlay").getValue()).toString().equals("1")) {
+                        if (Objects.requireNonNull(snapshot.child("isStop").getValue()).toString().equals("0")) {
+                            count = new CountDownTimer(4000, 1000) {
+                                @SuppressLint("SetTextI18n")
+                                @Override
+                                public void onTick(long millisUntilFinished) {
+                                    txtCountDownTime.setText((int) (millisUntilFinished / 1000) + " sec");
+                                    if ((int) (millisUntilFinished / 1000) == 0) {
+                                        txtCountDownTime.setText("Start");
+                                    }
                                 }
-                            }
 
-                            @Override
-                            public void onFinish() {
-                                showPlay();
-                                count.cancel();
-                            }
-                        }.start();
+                                @Override
+                                public void onFinish() {
 
+                                    showPlay();
+                                    if (count != null) {
+                                        count.cancel();
+                                        count = null;
+                                    }
+
+
+                                }
+                            }.start();
+
+                        } else {
+                            showStop();
+                        }
                     } else {
-                        showStop();
+                        // chưa làm gì cả bình tĩnh
                     }
-                } else {
-                    //chua chay
                 }
+
             }
 
             @Override
@@ -141,6 +195,9 @@ public class RoomActivity extends AppCompatActivity {
         layoutWait.setVisibility(View.GONE);
         end_game.setVisibility(View.VISIBLE);
 
+        stopCountdown();
+        cancelTimer();
+
     }
 
     private void showPlay() {
@@ -149,10 +206,10 @@ public class RoomActivity extends AppCompatActivity {
         end_game.setVisibility(View.GONE);
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                String id_question = Objects.requireNonNull(snapshot.child("topic").getValue()).toString();
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                String id_question = Objects.requireNonNull(task.getResult().child("topic").getValue()).toString();
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("topic").child(id_question);
                 reference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
                     @Override
@@ -163,11 +220,6 @@ public class RoomActivity extends AppCompatActivity {
                     }
                 });
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
         });
 
 
@@ -176,14 +228,21 @@ public class RoomActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void updateUI() {
         if (position > size) {
-            mPoint.setValue(point).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    showStop();
-                }
-            });
+            showStop();
+            if (!isKey) {
+                DatabaseReference isCheck = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isCheck");
+                isCheck.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                        int p = Integer.parseInt(task.getResult().getValue().toString());
+                        p++;
+                        isCheck.setValue(String.valueOf(p));
+                    }
+                });
+            }
+            mPoint.setValue(point);
+            isFinish = true;
 
-            Toast.makeText(this, "End Game!", Toast.LENGTH_SHORT).show();
         } else {
             txtTotal.setText(position + "/" + size);
             txtQuestion.setText(model.getQuestion().get(position).getTxtQuestion());
@@ -201,8 +260,10 @@ public class RoomActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void isPlay() {
+
         resetUI();
         updateUI();
+
 
     }
 
@@ -219,10 +280,6 @@ public class RoomActivity extends AppCompatActivity {
                     txtTime.setText((int) (millisUntilFinished / 1000 - 1) + " sec");
                 }
 
-                if (millisUntilFinished / 1000 == 0) {
-                    lock();
-                    checkAnwser();
-                }
             }
 
             @Override
@@ -250,13 +307,26 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void setPostDelay() {
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        position++;
-        isPlay();
+        lock();
+        checkAnwser();
+        postDelay = new CountDownTimer(2000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                if (postDelay != null) {
+                    postDelay.cancel();
+                    postDelay = null;
+                }
+
+                position++;
+                isPlay();
+            }
+        }.start();
+
 
     }
 
@@ -270,7 +340,6 @@ public class RoomActivity extends AppCompatActivity {
                 layoutB.setBackgroundResource(R.color.test_1);
                 layoutC.setBackgroundResource(R.color.test_1);
                 layoutD.setBackgroundResource(R.color.test_1);
-
                 answser = 1;
             }
         });
@@ -293,7 +362,6 @@ public class RoomActivity extends AppCompatActivity {
                 layoutC.setBackgroundResource(R.color.btnC);
                 layoutD.setBackgroundResource(R.color.test_1);
                 answser = 3;
-
             }
         });
         layoutD.setOnClickListener(new View.OnClickListener() {
@@ -311,14 +379,10 @@ public class RoomActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void checkAnwser() {
-
+        lock();
         if (answser == model.getQuestion().get(position).getAnswerTrue()) {
             point += 100;
         }
-
-        int checkout = model.getQuestion().get(position).getAnswerTrue();
-
-
         switch (model.getQuestion().get(position).getAnswerTrue()) {
             case 1: {
                 layoutA.setBackgroundResource(R.color.correct);
@@ -387,10 +451,18 @@ public class RoomActivity extends AppCompatActivity {
 
     }
 
+    @SuppressLint("SetTextI18n")
     private void initUtils() {
         id_room = getIntent().getStringExtra("id_room");
-        userList = new ArrayList<>();
 
+        txtID.setText("ID: " + id_room);
+
+        account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+
+        if (account != null) {
+            txtKeyName.setText(account.getDisplayName());
+        }
+        userList = new ArrayList<>();
         adapterUser = new AdapterUser(userList);
         mRecyclerview.setHasFixedSize(true);
         mRecyclerview.setLayoutManager(new GridLayoutManager(this, 6));
@@ -403,20 +475,38 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onSuccess(DataSnapshot dataSnapshot) {
                 if (Objects.requireNonNull(dataSnapshot.child("uid").getValue()).toString().equals(user.getUid())) {
+                    isKey = true;
                     btnCancel.setVisibility(View.VISIBLE);
                     btnStart.setVisibility(View.VISIBLE);
                 } else {
+                    isKey = false;
                     btnCancel.setVisibility(View.GONE);
                     btnStart.setVisibility(View.GONE);
                 }
+                txtRoomName.setText("Tên phòng: " + Objects.requireNonNull(dataSnapshot.child("name").getValue()).toString());
             }
         });
 
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isPlay");
-                reference.setValue("1");
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("user");
+                reference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        DatabaseReference cnt = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isCount");
+                        cnt.setValue(snapshot.getChildrenCount());
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isPlay");
+                        reference.setValue("1");
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+
             }
         });
 
@@ -450,12 +540,22 @@ public class RoomActivity extends AppCompatActivity {
         layoutC = findViewById(R.id.layoutC);
         layoutD = findViewById(R.id.layoutD);
         end_game = findViewById(R.id.end_game);
+
+        txtID = findViewById(R.id.txtID);
+        txtKeyName = findViewById(R.id.txtKeyName);
+        txtRoomName = findViewById(R.id.txtRoomName);
+
     }
 
     @Override
     public void onBackPressed() {
+        if (postDelay != null) {
+            postDelay.cancel();
+            postDelay = null;
+        }
         stopCountdown();
         removeValue();
+
 
     }
 
@@ -501,6 +601,11 @@ public class RoomActivity extends AppCompatActivity {
     private void cancelTimer() {
         if (count != null) {
             count.cancel();
+            count = null;
+        }
+        if (postDelay != null) {
+            postDelay.cancel();
+            postDelay = null;
         }
 
 

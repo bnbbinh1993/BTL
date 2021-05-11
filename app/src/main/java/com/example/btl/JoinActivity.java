@@ -67,9 +67,7 @@ public class JoinActivity extends AppCompatActivity {
         init();
         initAction();
 
-
     }
-
     private void init() {
         mRecyclerview = findViewById(R.id.mRecyclerview);
         toolbar = findViewById(R.id.toolbar);
@@ -95,12 +93,10 @@ public class JoinActivity extends AppCompatActivity {
                 joinClick(roomList.get(position).getId());
             }
         });
-
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
         getDataByFirebase();
-
 
         btnJoin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,8 +121,8 @@ public class JoinActivity extends AppCompatActivity {
             @Override
             public void onSuccess(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChild(key)) {
-                    if (dataSnapshot.child(key).child("isPlay").getValue().equals("0")) {
-                        if (!dataSnapshot.child(key).child("password").getValue().equals("0")) {
+                    if (Objects.requireNonNull(dataSnapshot.child(key).child("isPlay").getValue()).equals("0")) {
+                        if (!Objects.requireNonNull(dataSnapshot.child(key).child("password").getValue()).equals("0")) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(JoinActivity.this);
                             View view = LayoutInflater.from(JoinActivity.this).inflate(R.layout.check_password_dialog, null);
                             EditText ip = view.findViewById(R.id.password);
@@ -143,35 +139,35 @@ public class JoinActivity extends AppCompatActivity {
                                     } else {
                                         if (ip.getText().toString().trim().equals(dataSnapshot.child(key).child("password").getValue())) {
                                             dialog.dismiss();
-                                            // đẩy dữ liệu người chơi lên firebase ^^
                                             if (user != null) {
                                                 if (account != null) {
-                                                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(key).child("user").child(user.getUid());
-                                                    Map<String, String> map = new HashMap<>();
-                                                    map.put("uid", user.getUid());
-                                                    //nghĩ sau ^^
-                                                    //cập nhật hoạt động cửa user
-                                                    reference.setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                        @Override
-                                                        public void onComplete(@NonNull Task<Void> task) {
-                                                            if (task.isSuccessful()) {
-                                                                Intent intent = new Intent(JoinActivity.this, RoomActivity.class);
-                                                                intent.putExtra("id_room", key);
-                                                                startActivity(intent);
-                                                            } else {
-                                                                Toast.makeText(JoinActivity.this, "Error!", Toast.LENGTH_SHORT).show();
+                                                    if (!user.getUid().equals(Objects.requireNonNull(dataSnapshot.child(key).child("uid").getValue()).toString())) {
+                                                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(key).child("user").child(user.getUid());
+                                                        Map<String, String> map = new HashMap<>();
+                                                        map.put("uid", user.getUid());
+                                                        reference.setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    Intent intent = new Intent(JoinActivity.this, RoomActivity.class);
+                                                                    intent.putExtra("id_room", key);
+                                                                    startActivity(intent);
+                                                                } else {
+                                                                    Toast.makeText(JoinActivity.this, "Error!", Toast.LENGTH_SHORT).show();
+                                                                }
                                                             }
-                                                        }
-                                                    });
-
+                                                        });
+                                                    } else {
+                                                        Intent intent = new Intent(JoinActivity.this, RoomActivity.class);
+                                                        intent.putExtra("id_room", key);
+                                                        startActivity(intent);
+                                                    }
                                                 } else {
                                                     Toast.makeText(JoinActivity.this, "Error!", Toast.LENGTH_SHORT).show();
                                                 }
                                             } else {
                                                 Toast.makeText(JoinActivity.this, "Error!", Toast.LENGTH_SHORT).show();
                                             }
-
-
                                         } else {
                                             Toast.makeText(JoinActivity.this, "Error!", Toast.LENGTH_SHORT).show();
                                             ip.requestFocus();
@@ -252,7 +248,6 @@ public class JoinActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //reload
     }
 
 }
