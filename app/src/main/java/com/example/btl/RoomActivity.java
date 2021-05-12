@@ -118,6 +118,7 @@ public class RoomActivity extends AppCompatActivity {
 
     }
 
+
     private void isRank() {
         layoutRank.setVisibility(View.VISIBLE);
         progress_bar.setVisibility(View.INVISIBLE);
@@ -133,12 +134,6 @@ public class RoomActivity extends AppCompatActivity {
                 }
                 Collections.sort(scoreList);
 
-                for (int i = 0; i < scoreList.size(); i++) {
-                    if (user.getUid().equals(scoreList.get(i).getUid())) {
-                        txtRank.setText("Ranking: " + (i + 1));
-                        return;
-                    }
-                }
 
                 if (scoreList.size() > 0) {
                     rl1.setVisibility(View.VISIBLE);
@@ -164,6 +159,12 @@ public class RoomActivity extends AppCompatActivity {
                     txtScore3.setText(scoreList.get(2).getScore());
                 }
 
+                for (int i = 0; i < scoreList.size(); i++) {
+                    if (user.getUid().equals(scoreList.get(i).getUid())) {
+                        txtRank.setText("Ranking: " + (i + 1));
+                        return;
+                    }
+                }
 
             }
 
@@ -180,7 +181,9 @@ public class RoomActivity extends AppCompatActivity {
         isStop.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (Integer.parseInt(Objects.requireNonNull(snapshot.child("isCheck").getValue()).toString()) >= Integer.parseInt(snapshot.child("isCount").getValue().toString())) {
+                if (Integer.parseInt(Objects.requireNonNull(snapshot.child("isCheck").getValue()).toString()) >= Integer.parseInt(Objects.requireNonNull(snapshot.child("isCount").getValue()).toString())
+                        || snapshot.child("coin").getChildrenCount() > Integer.parseInt(Objects.requireNonNull(snapshot.child("isCount").getValue()).toString())
+                ) {
                     isStop.child("isStop").setValue("1");
                 }
             }
@@ -212,6 +215,7 @@ public class RoomActivity extends AppCompatActivity {
     private void initPlay() {
 
         mPoint = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("coin").child(user.getUid());
+
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -245,6 +249,10 @@ public class RoomActivity extends AppCompatActivity {
                         } else {
                             showStop();
                         }
+                    } else if (Objects.requireNonNull(snapshot.child("isStop").getValue()).toString().equals("0")) {
+                        layoutWait.setVisibility(View.VISIBLE);
+                        end_game.setVisibility(View.GONE);
+                        layoutPlay.setVisibility(View.GONE);
                     }
 
                 }
@@ -536,6 +544,9 @@ public class RoomActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void initUtils() {
+
+        layoutWait.setVisibility(View.VISIBLE);
+
         id_room = getIntent().getStringExtra("id_room");
         account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         userList = new ArrayList<>();
@@ -575,8 +586,15 @@ public class RoomActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         DatabaseReference cnt = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isCount");
                         cnt.setValue(snapshot.getChildrenCount());
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isPlay");
-                        reference.setValue("1");
+
+                        if (isKey) {
+                            if (!isFinish) {
+                                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isPlay");
+                                reference.setValue("1");
+                            }
+                        }
+
+
                     }
 
                     @Override
@@ -630,6 +648,7 @@ public class RoomActivity extends AppCompatActivity {
 
     private void clear() {
 
+
         DatabaseReference cl = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isRestart");
         cl.addValueEventListener(new ValueEventListener() {
             @Override
@@ -653,30 +672,8 @@ public class RoomActivity extends AppCompatActivity {
 
                             @Override
                             public void onFinish() {
-                                if (isKey) {
-                                    DatabaseReference rs1 = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
-                                    rs1.child("isPlay").setValue("0");
-                                    rs1.child("isStop").setValue("0");
-                                    rs1.child("isRestart").setValue("0");
-                                    rs1.child("isCheck").setValue("0");
-                                    Query aa = rs1.child("room").child(id_room).child("coin");
-                                    aa.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NotNull DataSnapshot a) {
-                                            for (DataSnapshot appleSnapshot : a.getChildren()) {
-                                                appleSnapshot.getRef().removeValue();
-                                            }
-
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NotNull DatabaseError databaseError) {
-                                            Log.e("TAG", "onCancelled", databaseError.toException());
-                                        }
-                                    });
-                                } else {
-
-                                }
+                                dialog.dismiss();
+                                removeValue();
                                 if (ct != null) {
                                     ct.cancel();
                                     ct = null;

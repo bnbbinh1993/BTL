@@ -3,6 +3,7 @@ package com.example.btl.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,7 +29,7 @@ public class AdapterUser extends RecyclerView.Adapter<AdapterUser.VH> {
 
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
-
+        holder.name.setText(userList.get(position).getName());
     }
 
     @Override
@@ -38,9 +39,11 @@ public class AdapterUser extends RecyclerView.Adapter<AdapterUser.VH> {
 
 
     static class VH extends RecyclerView.ViewHolder {
+        private TextView name;
 
         public VH(@NonNull View itemView) {
             super(itemView);
+            name = itemView.findViewById(R.id.name);
         }
     }
 }

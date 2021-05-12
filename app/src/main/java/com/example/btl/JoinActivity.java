@@ -68,6 +68,7 @@ public class JoinActivity extends AppCompatActivity {
         initAction();
 
     }
+
     private void init() {
         mRecyclerview = findViewById(R.id.mRecyclerview);
         toolbar = findViewById(R.id.toolbar);
@@ -145,6 +146,7 @@ public class JoinActivity extends AppCompatActivity {
                                                         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(key).child("user").child(user.getUid());
                                                         Map<String, String> map = new HashMap<>();
                                                         map.put("uid", user.getUid());
+                                                        map.put("name", account.getFamilyName());
                                                         reference.setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                             @Override
                                                             public void onComplete(@NonNull Task<Void> task) {

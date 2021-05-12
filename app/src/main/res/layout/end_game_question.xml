@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:visibility="visible">
 
     <ImageView
         android:layout_width="80dp"
@@ -21,12 +22,11 @@
         android:layout_gravity="center"
         android:layout_margin="10dp"
         android:gravity="center"
-        android:text="Chúc mừng bạn đã hoàn thành!"
+        android:text="Congratulations! you have completed!"
         android:textColor="@color/white"
         android:textSize="20sp"
         android:textStyle="bold"
         tools:ignore="HardcodedText" />
-
 
 
     <TextView
@@ -35,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="Tổng điểm: 100"
+
         android:textColor="@color/white"
         android:textSize="20sp"
         tools:ignore="HardcodedText" />
@@ -47,7 +47,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginBottom="20dp"
-        android:text="Thứ hạng: 2"
         android:textColor="@color/white"
         android:textSize="20sp"
         tools:ignore="HardcodedText" />
@@ -204,7 +203,7 @@
             android:layout_height="45dp"
             android:layout_gravity="center"
             android:layout_margin="5dp"
-            android:text="Open again"
+            android:text="END"
             tools:ignore="HardcodedText" />
     </LinearLayout>
 

@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
-            android:text="Re-creating rooms, please wait!"
+            android:text="Room is closed, please wait!"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="15sp"
