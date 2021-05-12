@@ -81,7 +81,6 @@ public class CreateQuestionActivity extends AppCompatActivity {
             String personId = acct.getId();
             Uri personPhoto = acct.getPhotoUrl();
 
-
         }
 
     }
