@@ -26,8 +26,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -115,7 +117,11 @@ public class CreateQuestionActivity extends AppCompatActivity {
                 reference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
                     @Override
                     public void onSuccess(DataSnapshot dataSnapshot) {
-                        long id = dataSnapshot.getChildrenCount() + 1000;
+                        long id = 1000;
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                            id = Long.parseLong(ds.child("id").getValue().toString());
+                        }
+                        id = id + 1;
                         Map<String, String> map = new HashMap<>();
                         String name = nameZoom.getText().toString().trim();
                         String des = descriptions.getText().toString().trim();
@@ -161,12 +167,7 @@ public class CreateQuestionActivity extends AppCompatActivity {
                             });
                         }
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(CreateQuestionActivity.this, "onFailure!", Toast.LENGTH_SHORT).show();
-                        progressDialog.dismiss();
-                    }
+
                 });
 
             }
