@@ -130,6 +130,7 @@ public class RoomActivity extends AppCompatActivity {
             @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                scoreList.clear();
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     Point md = ds.getValue(Point.class);
                     scoreList.add(md);
@@ -474,6 +475,9 @@ public class RoomActivity extends AppCompatActivity {
         if (answer == model.getQuestion().get(position).getAnswerTrue()) {
             point += 100;
         }
+
+        answer = 0;
+
         switch (model.getQuestion().get(position).getAnswerTrue()) {
             case 1: {
                 layoutA.setBackgroundResource(R.color.correct);
@@ -667,6 +671,7 @@ public class RoomActivity extends AppCompatActivity {
                         TextView txtTm = view.findViewById(R.id.txtTimeRestart);
                         builder.setView(view);
                         AlertDialog dialog = builder.create();
+                        dialog.setCancelable(false);
                         dialog.show();
 
                         ct = new CountDownTimer(11000, 1000) {

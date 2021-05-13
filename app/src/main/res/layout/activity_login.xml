@@ -9,16 +9,26 @@
     android:orientation="vertical"
     tools:context=".login.LoginActivity">
 
-    <ImageButton
-        android:id="@+id/imageTop"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/btnGG"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
-        android:background="@drawable/ic_google"
-        tools:ignore="ContentDescription" />
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="100dp"
+        app:cardElevation="10dp"
+        app:contentPadding="5dp"
+        app:strokeColor="@color/white"
+        app:strokeWidth="2dp">
 
+        <ImageButton
+            android:id="@+id/imageTop"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@drawable/ic_google"
+            tools:ignore="ContentDescription" />
+
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/btnGG"

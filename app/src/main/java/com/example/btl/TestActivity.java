@@ -11,11 +11,13 @@ import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.btl.adapter.AdapterUser;
+import com.example.btl.model.Point;
 import com.example.btl.model.Topic;
 import com.example.btl.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,6 +32,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,7 +41,7 @@ public class TestActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseUser user;
     private MaterialButton btnNext;
-    private MaterialButton btnFinish;
+    private MaterialButton btnFinish_end;
     private Topic model = new Topic();
     private int position = 1;
     private int size = 0;
@@ -46,6 +50,26 @@ public class TestActivity extends AppCompatActivity {
     private LinearLayout layoutA, layoutB, layoutC, layoutD;
     private CountDownTimer downTimer;
     private CountDownTimer postDelay;
+    private int point = 0;
+    private int answer = 0;
+    private LinearLayout end_test;
+    private RelativeLayout layoutTest;
+    private String id_topic = "1000";
+
+    private ProgressBar progress_bar;
+    private TextView txtNameTop1;
+    private TextView txtNameTop2;
+    private TextView txtNameTop3;
+    private TextView txtScore1;
+    private TextView txtScore2;
+    private TextView txtScore3;
+    private TextView txtPoint;
+    private TextView txtRank;
+    private LinearLayout layoutRank;
+    private List<Point> scoreList;
+    private RelativeLayout rl1;
+    private RelativeLayout rl2;
+    private RelativeLayout rl3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +81,15 @@ public class TestActivity extends AppCompatActivity {
     }
 
     private void initUtils() {
+        scoreList = new ArrayList<>();
+        end_test.setVisibility(View.GONE);
+        layoutTest.setVisibility(View.VISIBLE);
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
+
         Intent intent = getIntent();
         if (intent != null) {
-            String id_topic = intent.getStringExtra("_topic_id");
+            id_topic = intent.getStringExtra("_topic_id");
             showPlay(id_topic);
 
         }
@@ -90,24 +120,90 @@ public class TestActivity extends AppCompatActivity {
 
             }
 
+            @SuppressLint("SetTextI18n")
             @Override
             public void onFinish() {
-                if (position > size) {
-                    btnNext.setVisibility(View.GONE);
-                    btnFinish.setVisibility(View.VISIBLE);
-                } else {
-                    btnNext.setVisibility(View.VISIBLE);
-                    btnFinish.setVisibility(View.GONE);
-                }
                 if (postDelay != null) {
                     postDelay.cancel();
                     postDelay = null;
+                }
+                if (position > size) {
+                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("topic").child(id_topic).child("rank");
+                    Point map = new Point(user.getUid(), user.getDisplayName(), String.valueOf(point));
+                    reference.child(user.getUid()).setValue(map);
+                    txtPoint.setText("Score: " + point);
+                    btnNext.setVisibility(View.GONE);
+                    end_test.setVisibility(View.VISIBLE);
+                    layoutTest.setVisibility(View.GONE);
+                    isRank();
+                } else {
+                    btnNext.setVisibility(View.VISIBLE);
                 }
             }
         }.start();
 
 
     }
+
+
+    private void isRank() {
+        layoutRank.setVisibility(View.VISIBLE);
+        progress_bar.setVisibility(View.INVISIBLE);
+        scoreList = new ArrayList<>();
+        DatabaseReference rank = FirebaseDatabase.getInstance().getReference().child("topic").child(id_topic).child("rank");
+        rank.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                scoreList.clear();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    Point md = ds.getValue(Point.class);
+                    scoreList.add(md);
+                }
+                Collections.sort(scoreList);
+
+
+                if (scoreList.size() > 0) {
+                    rl1.setVisibility(View.VISIBLE);
+                    rl2.setVisibility(View.GONE);
+                    rl3.setVisibility(View.GONE);
+                    txtNameTop1.setText(scoreList.get(0).getName());
+                    txtScore1.setText(scoreList.get(0).getScore());
+
+                }
+                if (scoreList.size() > 1) {
+                    rl1.setVisibility(View.VISIBLE);
+                    rl2.setVisibility(View.VISIBLE);
+                    rl3.setVisibility(View.GONE);
+                    txtNameTop2.setText(scoreList.get(1).getName());
+                    txtScore2.setText(scoreList.get(1).getScore());
+
+                }
+                if (scoreList.size() > 2) {
+                    rl1.setVisibility(View.VISIBLE);
+                    rl2.setVisibility(View.VISIBLE);
+                    rl3.setVisibility(View.VISIBLE);
+                    txtNameTop3.setText(scoreList.get(2).getName());
+                    txtScore3.setText(scoreList.get(2).getScore());
+                }
+
+                for (int i = 0; i < scoreList.size(); i++) {
+                    if (user.getUid().equals(scoreList.get(i).getUid())) {
+                        txtRank.setText("Ranking: " + (i + 1));
+                        return;
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
 
     @SuppressLint("SetTextI18n")
     private void isPlay() {
@@ -179,11 +275,11 @@ public class TestActivity extends AppCompatActivity {
     }
 
     private void resetUI() {
+        answer = 0;
         layoutA.setBackgroundResource(R.color.btnA);
         layoutB.setBackgroundResource(R.color.btnB);
         layoutC.setBackgroundResource(R.color.btnC);
         layoutD.setBackgroundResource(R.color.btnD);
-
         btnNext.setVisibility(View.GONE);
     }
 
@@ -196,7 +292,7 @@ public class TestActivity extends AppCompatActivity {
                 layoutB.setBackgroundResource(R.color.test_1);
                 layoutC.setBackgroundResource(R.color.test_1);
                 layoutD.setBackgroundResource(R.color.test_1);
-
+                answer = 1;
                 stopCountdown();
                 setPostDelay();
 
@@ -209,7 +305,7 @@ public class TestActivity extends AppCompatActivity {
                 layoutB.setBackgroundResource(R.color.btnB);
                 layoutC.setBackgroundResource(R.color.test_1);
                 layoutD.setBackgroundResource(R.color.test_1);
-
+                answer = 2;
                 stopCountdown();
                 setPostDelay();
             }
@@ -221,7 +317,7 @@ public class TestActivity extends AppCompatActivity {
                 layoutB.setBackgroundResource(R.color.test_1);
                 layoutC.setBackgroundResource(R.color.btnC);
                 layoutD.setBackgroundResource(R.color.test_1);
-
+                answer = 3;
                 stopCountdown();
                 setPostDelay();
             }
@@ -233,7 +329,7 @@ public class TestActivity extends AppCompatActivity {
                 layoutB.setBackgroundResource(R.color.test_1);
                 layoutC.setBackgroundResource(R.color.test_1);
                 layoutD.setBackgroundResource(R.color.btnD);
-
+                answer = 4;
                 stopCountdown();
                 setPostDelay();
 
@@ -248,7 +344,7 @@ public class TestActivity extends AppCompatActivity {
             }
         });
 
-        btnFinish.setOnClickListener(new View.OnClickListener() {
+        btnFinish_end.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
@@ -259,7 +355,9 @@ public class TestActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void checkAnwser() {
-
+        if (model.getQuestion().get(position).getAnswerTrue() == answer) {
+            point = point + 100;
+        }
         switch (model.getQuestion().get(position).getAnswerTrue()) {
             case 1: {
                 layoutA.setBackgroundResource(R.color.correct);
@@ -298,7 +396,6 @@ public class TestActivity extends AppCompatActivity {
     private void init() {
 
         btnNext = findViewById(R.id.btnNext);
-        btnFinish = findViewById(R.id.btnFinish);
         txtQuestion = findViewById(R.id.txtQuestion);
         txtAnswerA = findViewById(R.id.txtAnswerA);
         txtAnswerB = findViewById(R.id.txtAnswerB);
@@ -310,6 +407,23 @@ public class TestActivity extends AppCompatActivity {
         layoutB = findViewById(R.id.layoutB);
         layoutC = findViewById(R.id.layoutC);
         layoutD = findViewById(R.id.layoutD);
+        end_test = findViewById(R.id.end_test);
+        layoutTest = findViewById(R.id.layoutTest);
+        btnFinish_end = findViewById(R.id.btnFinish_end);
+        progress_bar = findViewById(R.id.progress_bar);
+        txtNameTop1 = findViewById(R.id.txtNameTop1);
+        txtNameTop2 = findViewById(R.id.txtNameTop2);
+        txtNameTop3 = findViewById(R.id.txtNameTop3);
+        txtScore1 = findViewById(R.id.txtScore1);
+        txtScore2 = findViewById(R.id.txtScore2);
+        txtScore3 = findViewById(R.id.txtScore3);
+        txtPoint = findViewById(R.id.txtPoint);
+        txtRank = findViewById(R.id.txtRank);
+        layoutRank = findViewById(R.id.layoutRank);
+        progress_bar = findViewById(R.id.progress_bar);
+        rl1 = findViewById(R.id.rl1);
+        rl2 = findViewById(R.id.rl2);
+        rl3 = findViewById(R.id.rl3);
 
     }
 
