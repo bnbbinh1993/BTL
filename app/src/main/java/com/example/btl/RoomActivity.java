@@ -93,9 +93,11 @@ public class RoomActivity extends AppCompatActivity {
     private boolean isFinish = false;
     private boolean isKey = false;
     private boolean isRestart = false;
+    private boolean isStart = false;
     private String id_room = "";
     private GoogleSignInAccount account;
     private ProgressBar progress_bar;
+    private String pass_room = "";
 
     private DatabaseReference mPoint;
     private TextView txtQuestion, txtAnswerA, txtAnswerB, txtAnswerC, txtAnswerD, txtTotal, txtTime;
@@ -181,12 +183,11 @@ public class RoomActivity extends AppCompatActivity {
         isStop.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (Integer.parseInt(Objects.requireNonNull(snapshot.child("isCheck").getValue()).toString()) >= Integer.parseInt(Objects.requireNonNull(snapshot.child("isCount").getValue()).toString())
-                        || snapshot.child("coin").getChildrenCount() > Integer.parseInt(Objects.requireNonNull(snapshot.child("isCount").getValue()).toString())
-                ) {
+                if (snapshot.child("coin").getChildrenCount() == (snapshot.child("user").getChildrenCount() + 1)) {
                     isStop.child("isStop").setValue("1");
                 }
             }
+
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -215,7 +216,6 @@ public class RoomActivity extends AppCompatActivity {
     private void initPlay() {
 
         mPoint = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("coin").child(user.getUid());
-
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -223,6 +223,7 @@ public class RoomActivity extends AppCompatActivity {
                 if (!isFinish) {
                     if (Objects.requireNonNull(snapshot.child("isPlay").getValue()).toString().equals("1")) {
                         if (Objects.requireNonNull(snapshot.child("isStop").getValue()).toString().equals("0")) {
+                            isStart = true;
                             count = new CountDownTimer(4000, 1000) {
                                 @SuppressLint("SetTextI18n")
                                 @Override
@@ -548,6 +549,8 @@ public class RoomActivity extends AppCompatActivity {
         layoutWait.setVisibility(View.VISIBLE);
 
         id_room = getIntent().getStringExtra("id_room");
+        pass_room = getIntent().getStringExtra("pass_room");
+
         account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         userList = new ArrayList<>();
         adapterUser = new AdapterUser(userList);
@@ -591,6 +594,7 @@ public class RoomActivity extends AppCompatActivity {
                             if (!isFinish) {
                                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isPlay");
                                 reference.setValue("1");
+                                isStart = true;
                             }
                         }
 
@@ -613,7 +617,9 @@ public class RoomActivity extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(RoomActivity.this);
                 View view = LayoutInflater.from(RoomActivity.this).inflate(R.layout.pin_view, null);
                 TextView txtPin = view.findViewById(R.id.txtPin);
-                txtPin.setText(id_room);
+                TextView txtPass = view.findViewById(R.id.txtPass);
+                txtPin.setText("ID: " + id_room);
+                txtPass.setText("Pass: " + pass_room);
                 builder.setView(view);
                 AlertDialog dialog = builder.create();
                 dialog.show();
@@ -752,7 +758,7 @@ public class RoomActivity extends AppCompatActivity {
 
     protected void onStop() {
         super.onStop();
-        removeValue();
+        //removeValue();
 
     }
 
@@ -783,6 +789,7 @@ public class RoomActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        removeValue();
         cancelTimer();
         stopCountdown();
     }

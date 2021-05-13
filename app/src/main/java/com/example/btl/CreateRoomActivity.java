@@ -1,5 +1,5 @@
 
- package com.example.btl;
+package com.example.btl;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -138,6 +138,7 @@ public class CreateRoomActivity extends AppCompatActivity {
                                                             public void onSuccess(Void aVoid) {
                                                                 Intent intent = new Intent(CreateRoomActivity.this, RoomActivity.class);
                                                                 intent.putExtra("id_room", String.valueOf(key));
+                                                                intent.putExtra("pass_room", String.valueOf(pass));
                                                                 finish();
                                                                 startActivity(intent);
                                                                 Toast.makeText(CreateRoomActivity.this, "isSuccessful!", Toast.LENGTH_SHORT).show();

@@ -14,7 +14,21 @@
         <TextView
             android:id="@+id/txtPin"
             style="@style/TXT"
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_7"
+            android:gravity="center"
+            android:padding="5dp"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="25sp" />
+
+        <TextView
+            android:layout_marginTop="5dp"
+            android:id="@+id/txtPass"
+            style="@style/TXT"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@drawable/bg_7"

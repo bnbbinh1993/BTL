@@ -153,6 +153,7 @@ public class JoinActivity extends AppCompatActivity {
                                                                 if (task.isSuccessful()) {
                                                                     Intent intent = new Intent(JoinActivity.this, RoomActivity.class);
                                                                     intent.putExtra("id_room", key);
+                                                                    intent.putExtra("pass_room", ip.getText().toString());
                                                                     startActivity(intent);
                                                                 } else {
                                                                     Toast.makeText(JoinActivity.this, "Error!", Toast.LENGTH_SHORT).show();
