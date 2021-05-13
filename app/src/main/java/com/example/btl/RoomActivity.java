@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -20,6 +21,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.btl.adapter.AdapterUser;
+import com.example.btl.adapter.PageAdapter;
+import com.example.btl.fragment.ChatFragment;
+import com.example.btl.fragment.UserFragment;
 import com.example.btl.model.Point;
 import com.example.btl.model.Topic;
 import com.example.btl.model.User;
@@ -29,6 +33,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -50,8 +55,7 @@ import java.util.Objects;
 
 
 public class RoomActivity extends AppCompatActivity {
-    private RecyclerView mRecyclerview;
-    private AdapterUser adapterUser;
+
     private List<User> userList;
     private List<Point> scoreList;
     private FirebaseUser user;
@@ -94,14 +98,20 @@ public class RoomActivity extends AppCompatActivity {
     private boolean isKey = false;
     private boolean isRestart = false;
     private boolean isStart = false;
-    private String id_room = "";
     private GoogleSignInAccount account;
     private ProgressBar progress_bar;
-    private String pass_room = "";
 
     private DatabaseReference mPoint;
     private TextView txtQuestion, txtAnswerA, txtAnswerB, txtAnswerC, txtAnswerD, txtTotal, txtTime;
     private LinearLayout layoutA, layoutB, layoutC, layoutD;
+
+    private ViewPager viewPager;
+    private TabLayout tablayout;
+    private PageAdapter adapter;
+
+    public static String pass_room = "";
+    public static String id_room = "";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -531,10 +541,9 @@ public class RoomActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 userList.clear();
                 for (DataSnapshot s : snapshot.getChildren()) {
-                    User model = s.getValue(User.class);
+                        User model = s.getValue(User.class);
                     userList.add(model);
                 }
-                adapterUser.notifyDataSetChanged();
                 txtCountNumber.setText(String.valueOf(userList.size()));
             }
 
@@ -551,16 +560,19 @@ public class RoomActivity extends AppCompatActivity {
     private void initUtils() {
 
         layoutWait.setVisibility(View.VISIBLE);
-
         id_room = getIntent().getStringExtra("id_room");
         pass_room = getIntent().getStringExtra("pass_room");
 
+        //fragment
+        adapter = new PageAdapter(getSupportFragmentManager());
+        adapter.addFragment(new UserFragment(), "User");
+        adapter.addFragment(new ChatFragment(), "Messenger");
+        viewPager.setAdapter(adapter);
+        tablayout.setupWithViewPager(viewPager);
+
         account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         userList = new ArrayList<>();
-        adapterUser = new AdapterUser(userList);
-        mRecyclerview.setHasFixedSize(true);
-        mRecyclerview.setLayoutManager(new GridLayoutManager(this, 6));
-        mRecyclerview.setAdapter(adapterUser);
+
         FirebaseAuth auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
@@ -705,7 +717,7 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void init() {
-        mRecyclerview = findViewById(R.id.mRecyclerview);
+
         btnNext = findViewById(R.id.btnNext);
         layoutPlay = findViewById(R.id.layoutPlay);
         txtQuestion = findViewById(R.id.txtQuestion);
@@ -743,17 +755,27 @@ public class RoomActivity extends AppCompatActivity {
         rl2 = findViewById(R.id.rl2);
         rl3 = findViewById(R.id.rl3);
 
+        viewPager = findViewById(R.id.viewpager);
+        tablayout = findViewById(R.id.tablayout);
+
 
     }
 
     @Override
     public void onBackPressed() {
-        if (postDelay != null) {
-            postDelay.cancel();
-            postDelay = null;
+
+        if (!isStart){
+            if (postDelay != null) {
+                postDelay.cancel();
+                postDelay = null;
+            }
+            stopCountdown();
+            removeValue();
+        }else {
+            //showdialog hỏi có muốn thoát hay không ^^
         }
-        stopCountdown();
-        removeValue();
+
+
 
 
     }

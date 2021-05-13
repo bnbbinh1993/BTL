@@ -115,6 +115,7 @@ public class JoinActivity extends AppCompatActivity {
 
     }
 
+
     private void joinClick(String key) {
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room");
@@ -163,6 +164,7 @@ public class JoinActivity extends AppCompatActivity {
                                                     } else {
                                                         Intent intent = new Intent(JoinActivity.this, RoomActivity.class);
                                                         intent.putExtra("id_room", key);
+                                                        intent.putExtra("pass_room", ip.getText().toString());
                                                         startActivity(intent);
                                                     }
                                                 } else {
@@ -252,5 +254,6 @@ public class JoinActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
     }
+
 
 }
