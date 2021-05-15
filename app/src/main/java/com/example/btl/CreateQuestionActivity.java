@@ -60,6 +60,7 @@ public class CreateQuestionActivity extends AppCompatActivity {
     private EditText descriptions;
     private int AnswerTrue = 1;
     private GoogleSignInAccount acct;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +94,7 @@ public class CreateQuestionActivity extends AppCompatActivity {
         acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         radiobuttonClick();
         btnA.setChecked(true);
+
         adapterQuestion = new AdapterQuestion(list);
         mRecyclerview.setHasFixedSize(true);
         mRecyclerview.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
@@ -110,7 +112,7 @@ public class CreateQuestionActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 final ProgressDialog progressDialog = new ProgressDialog(CreateQuestionActivity.this);
-                progressDialog.setTitle("Uploading");
+                progressDialog.setTitle("Uploading...Please wait!");
                 progressDialog.show();
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("topic");
                 reference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
@@ -118,7 +120,7 @@ public class CreateQuestionActivity extends AppCompatActivity {
                     public void onSuccess(DataSnapshot dataSnapshot) {
                         long id = 1000;
                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                            id = Long.parseLong(ds.child("id").getValue().toString());
+                            id = Long.parseLong(Objects.requireNonNull(ds.child("id").getValue()).toString());
                         }
                         id = id + 1;
                         Map<String, String> map = new HashMap<>();

@@ -5,11 +5,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -42,6 +44,7 @@ public class CreateRoomActivity extends AppCompatActivity {
     private MaterialButton btnCreate;
     private GoogleSignInAccount account;
     private FirebaseUser user;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,9 +66,14 @@ public class CreateRoomActivity extends AppCompatActivity {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+        progressDialog = new ProgressDialog(CreateRoomActivity.this);
+        progressDialog.setMessage("Please wait!");
+        progressDialog.setCancelable(false);
+
         btnCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressDialog.show();
                 create();
             }
         });
@@ -136,9 +144,10 @@ public class CreateRoomActivity extends AppCompatActivity {
                                                         reference.child("room").child(String.valueOf(Integer.parseInt(id) + 1)).setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                             @Override
                                                             public void onSuccess(Void aVoid) {
+                                                                progressDialog.dismiss();
                                                                 Intent intent = new Intent(CreateRoomActivity.this, RoomActivity.class);
                                                                 intent.putExtra("id_room", String.valueOf(key));
-                                                                intent.putExtra("pass_room", String.valueOf(pass));
+                                                                intent.putExtra("pass_room", pass);
                                                                 finish();
                                                                 startActivity(intent);
                                                                 Toast.makeText(CreateRoomActivity.this, "isSuccessful!", Toast.LENGTH_SHORT).show();

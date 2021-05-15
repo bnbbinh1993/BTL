@@ -8,25 +8,32 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.btl.adapter.AdapterUser;
 import com.example.btl.adapter.PageAdapter;
+import com.example.btl.adapter.RankAdapter;
 import com.example.btl.fragment.ChatFragment;
 import com.example.btl.fragment.UserFragment;
 import com.example.btl.model.Point;
 import com.example.btl.model.Topic;
 import com.example.btl.model.User;
+import com.example.btl.utils.Pef;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -54,30 +61,21 @@ import java.util.List;
 import java.util.Objects;
 
 
-public class RoomActivity extends AppCompatActivity {
+public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
     private List<User> userList;
     private List<Point> scoreList;
     private FirebaseUser user;
-    private LinearLayout end_game;
+    private RelativeLayout end_game;
     private LinearLayout layoutRank;
     private RelativeLayout layoutPlay;
     private RelativeLayout layoutWait;
-    private RelativeLayout rl1;
-    private RelativeLayout rl2;
-    private RelativeLayout rl3;
     private CountDownTimer count;
     private CountDownTimer downTimer;
     private CountDownTimer postDelay;
     private CountDownTimer ct;
     private TextView txtRoomName;
     private TextView txtCountNumber;
-    private TextView txtNameTop1;
-    private TextView txtNameTop2;
-    private TextView txtNameTop3;
-    private TextView txtScore1;
-    private TextView txtScore2;
-    private TextView txtScore3;
     private TextView txtPoint;
     private TextView txtRank;
     private ImageButton btnMenu;
@@ -97,7 +95,9 @@ public class RoomActivity extends AppCompatActivity {
     private boolean isFinish = false;
     private boolean isKey = false;
     private boolean isRestart = false;
-    private boolean isStart = false;
+    private boolean isStop = false;
+    private boolean isEnd = false;
+    private boolean isClosed = false;
     private GoogleSignInAccount account;
     private ProgressBar progress_bar;
 
@@ -107,10 +107,14 @@ public class RoomActivity extends AppCompatActivity {
 
     private ViewPager viewPager;
     private TabLayout tablayout;
-    private PageAdapter adapter;
+
+    private RecyclerView mRank;
+    private RankAdapter rankAdapter;
+
 
     public static String pass_room = "";
     public static String id_room = "";
+    public static String uid = "";
 
 
     @Override
@@ -135,6 +139,11 @@ public class RoomActivity extends AppCompatActivity {
         layoutRank.setVisibility(View.VISIBLE);
         progress_bar.setVisibility(View.INVISIBLE);
         scoreList = new ArrayList<>();
+        rankAdapter = new RankAdapter(scoreList);
+        mRank.setHasFixedSize(true);
+        mRank.setLayoutManager(new GridLayoutManager(RoomActivity.this, 1));
+        mRank.setAdapter(rankAdapter);
+
         DatabaseReference rank = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("coin");
         rank.addValueEventListener(new ValueEventListener() {
             @SuppressLint("SetTextI18n")
@@ -146,31 +155,7 @@ public class RoomActivity extends AppCompatActivity {
                     scoreList.add(md);
                 }
                 Collections.sort(scoreList);
-
-
-                if (scoreList.size() > 0) {
-                    rl1.setVisibility(View.VISIBLE);
-                    rl2.setVisibility(View.GONE);
-                    rl3.setVisibility(View.GONE);
-                    txtNameTop1.setText(scoreList.get(0).getName());
-                    txtScore1.setText(scoreList.get(0).getScore());
-
-                }
-                if (scoreList.size() > 1) {
-                    rl1.setVisibility(View.VISIBLE);
-                    rl2.setVisibility(View.VISIBLE);
-                    rl3.setVisibility(View.GONE);
-                    txtNameTop2.setText(scoreList.get(1).getName());
-                    txtScore2.setText(scoreList.get(1).getScore());
-
-                }
-                if (scoreList.size() > 2) {
-                    rl1.setVisibility(View.VISIBLE);
-                    rl2.setVisibility(View.VISIBLE);
-                    rl3.setVisibility(View.VISIBLE);
-                    txtNameTop3.setText(scoreList.get(2).getName());
-                    txtScore3.setText(scoreList.get(2).getScore());
-                }
+                rankAdapter.notifyDataSetChanged();
 
                 for (int i = 0; i < scoreList.size(); i++) {
                     if (user.getUid().equals(scoreList.get(i).getUid())) {
@@ -208,11 +193,12 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void isStop() {
-        DatabaseReference isStop = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
-        isStop.addValueEventListener(new ValueEventListener() {
+        DatabaseReference stop = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
+        stop.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (Objects.equals(snapshot.child("isStop").getValue(), "1")) {
+                    isStop = true;
                     isRank();
                 }
             }
@@ -225,57 +211,59 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void initPlay() {
+        if (!isStop) {
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (!isFinish) {
+                        if (Objects.requireNonNull(snapshot.child("isPlay").getValue()).toString().equals("1")) {
+                            if (Objects.requireNonNull(snapshot.child("isStop").getValue()).toString().equals("0")) {
 
-        mPoint = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("coin").child(user.getUid());
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!isFinish) {
-                    if (Objects.requireNonNull(snapshot.child("isPlay").getValue()).toString().equals("1")) {
-                        if (Objects.requireNonNull(snapshot.child("isStop").getValue()).toString().equals("0")) {
-                            isStart = true;
-                            count = new CountDownTimer(4000, 1000) {
-                                @SuppressLint("SetTextI18n")
-                                @Override
-                                public void onTick(long millisUntilFinished) {
-                                    txtRoomName.setText((int) (millisUntilFinished / 1000) + " sec");
-                                    if ((int) (millisUntilFinished / 1000) == 0) {
-                                        txtRoomName.setText("Start");
-                                    }
-                                }
-
-                                @Override
-                                public void onFinish() {
-
-                                    showPlay();
-                                    if (count != null) {
-                                        count.cancel();
-                                        count = null;
+                                count = new CountDownTimer(4000, 1000) {
+                                    @SuppressLint("SetTextI18n")
+                                    @Override
+                                    public void onTick(long millisUntilFinished) {
+                                        txtRoomName.setText((int) (millisUntilFinished / 1000) + " sec");
+                                        if ((int) (millisUntilFinished / 1000) == 0) {
+                                            txtRoomName.setText("Start");
+                                        }
                                     }
 
+                                    @Override
+                                    public void onFinish() {
 
-                                }
-                            }.start();
+                                        showPlay();
+                                        if (count != null) {
+                                            count.cancel();
+                                            count = null;
+                                        }
 
-                        } else {
-                            showStop();
+
+                                    }
+                                }.start();
+
+                            } else {
+                                showStop();
+                            }
+                        } else if (Objects.requireNonNull(snapshot.child("isStop").getValue()).toString().equals("0")) {
+                            layoutWait.setVisibility(View.VISIBLE);
+                            end_game.setVisibility(View.GONE);
+                            layoutPlay.setVisibility(View.GONE);
                         }
-                    } else if (Objects.requireNonNull(snapshot.child("isStop").getValue()).toString().equals("0")) {
-                        layoutWait.setVisibility(View.VISIBLE);
-                        end_game.setVisibility(View.GONE);
-                        layoutPlay.setVisibility(View.GONE);
+
                     }
 
                 }
 
-            }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                }
+            });
+        }
 
-            }
-        });
+
     }
 
     private void stopCountdown() {
@@ -318,7 +306,6 @@ public class RoomActivity extends AppCompatActivity {
             }
         });
 
-
     }
 
     @SuppressLint("SetTextI18n")
@@ -326,25 +313,25 @@ public class RoomActivity extends AppCompatActivity {
         if (position > size) {
             showStop();
             if (!isKey) {
-                DatabaseReference isCheck = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isCheck");
-                isCheck.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                DatabaseReference check = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isCheck");
+                check.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DataSnapshot> task) {
                         int p = Integer.parseInt(Objects.requireNonNull(Objects.requireNonNull(task.getResult()).getValue()).toString());
                         p++;
-                        isCheck.setValue(String.valueOf(p));
+                        if (!isEnd) {
+                            isEnd = true;
+                            check.setValue(String.valueOf(p));
+                        }
                     }
                 });
             }
-
             txtPoint.setText("Total score: " + point);
-
             pt.setName(account.getDisplayName());
             pt.setUid(user.getUid());
             pt.setScore(String.valueOf(point));
             mPoint.setValue(pt);
             isFinish = true;
-
         } else {
             txtTotal.setText(position + "/" + size);
             txtQuestion.setText(model.getQuestion().get(position).getTxtQuestion());
@@ -423,7 +410,7 @@ public class RoomActivity extends AppCompatActivity {
                     postDelay.cancel();
                     postDelay = null;
                 }
-
+                answer = 0;
                 position++;
                 isPlay();
             }
@@ -479,6 +466,34 @@ public class RoomActivity extends AppCompatActivity {
 
     }
 
+    private void checkChoose(int i) {
+        if (model.getQuestion().get(position).getAnswerTrue() != answer) {
+            switch (answer) {
+                case 1: {
+                    layoutA.setBackgroundResource(R.color.btnChoose);
+                    break;
+                }
+                case 2: {
+                    layoutB.setBackgroundResource(R.color.btnChoose);
+                    break;
+                }
+                case 3: {
+                    layoutC.setBackgroundResource(R.color.btnChoose);
+                    break;
+                }
+                case 4: {
+                    layoutD.setBackgroundResource(R.color.btnChoose);
+                    break;
+                }
+                default: {
+                    // k làm gì ^^
+                }
+
+            }
+        }
+
+    }
+
     @SuppressLint("SetTextI18n")
     private void checkAnwser() {
         lock();
@@ -486,14 +501,13 @@ public class RoomActivity extends AppCompatActivity {
             point += 100;
         }
 
-        answer = 0;
-
         switch (model.getQuestion().get(position).getAnswerTrue()) {
             case 1: {
                 layoutA.setBackgroundResource(R.color.correct);
                 layoutB.setBackgroundResource(R.color.wrong);
                 layoutC.setBackgroundResource(R.color.wrong);
                 layoutD.setBackgroundResource(R.color.wrong);
+                checkChoose(1);
                 break;
             }
             case 2: {
@@ -501,6 +515,7 @@ public class RoomActivity extends AppCompatActivity {
                 layoutB.setBackgroundResource(R.color.correct);
                 layoutC.setBackgroundResource(R.color.wrong);
                 layoutD.setBackgroundResource(R.color.wrong);
+                checkChoose(2);
                 break;
             }
             case 3: {
@@ -508,6 +523,7 @@ public class RoomActivity extends AppCompatActivity {
                 layoutB.setBackgroundResource(R.color.wrong);
                 layoutC.setBackgroundResource(R.color.correct);
                 layoutD.setBackgroundResource(R.color.wrong);
+                checkChoose(3);
                 break;
             }
             case 4: {
@@ -515,6 +531,7 @@ public class RoomActivity extends AppCompatActivity {
                 layoutB.setBackgroundResource(R.color.wrong);
                 layoutC.setBackgroundResource(R.color.wrong);
                 layoutD.setBackgroundResource(R.color.correct);
+                checkChoose(4);
                 break;
             }
         }
@@ -541,7 +558,7 @@ public class RoomActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 userList.clear();
                 for (DataSnapshot s : snapshot.getChildren()) {
-                        User model = s.getValue(User.class);
+                    User model = s.getValue(User.class);
                     userList.add(model);
                 }
                 txtCountNumber.setText(String.valueOf(userList.size()));
@@ -558,24 +575,23 @@ public class RoomActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void initUtils() {
-
+        Pef.getReference(RoomActivity.this);
+        Pef.setFullScreen(RoomActivity.this);
         layoutWait.setVisibility(View.VISIBLE);
         id_room = getIntent().getStringExtra("id_room");
         pass_room = getIntent().getStringExtra("pass_room");
-
-        //fragment
-        adapter = new PageAdapter(getSupportFragmentManager());
+        PageAdapter adapter = new PageAdapter(getSupportFragmentManager());
         adapter.addFragment(new UserFragment(), "User");
         adapter.addFragment(new ChatFragment(), "Messenger");
         viewPager.setAdapter(adapter);
         tablayout.setupWithViewPager(viewPager);
-
         account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         userList = new ArrayList<>();
-
         FirebaseAuth auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
-
+        assert user != null;
+        uid = user.getUid();
+        mPoint = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("coin").child(user.getUid());
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
         ref.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
@@ -584,13 +600,12 @@ public class RoomActivity extends AppCompatActivity {
                     isKey = true;
                     btnPlay.setVisibility(View.VISIBLE);
                     btnMenu.setVisibility(View.VISIBLE);
-                    btnOpen.setVisibility(View.VISIBLE);
                 } else {
                     isKey = false;
                     btnPlay.setVisibility(View.GONE);
                     btnMenu.setVisibility(View.GONE);
-                    btnOpen.setVisibility(View.GONE);
                 }
+                btnOpen.setVisibility(View.GONE);
                 txtRoomName.setText(Objects.requireNonNull(dataSnapshot.child("name").getValue()).toString());
             }
         });
@@ -610,16 +625,13 @@ public class RoomActivity extends AppCompatActivity {
                             if (!isFinish) {
                                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isPlay");
                                 reference.setValue("1");
-                                isStart = true;
+
                             }
                         }
-
-
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-
                     }
                 });
 
@@ -645,6 +657,7 @@ public class RoomActivity extends AppCompatActivity {
         benFinish_end.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isClosed = true;
                 removeValue();
             }
         });
@@ -664,55 +677,82 @@ public class RoomActivity extends AppCompatActivity {
 
             }
         });
+        btnMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu popup = new PopupMenu(RoomActivity.this, v);
+                popup.setOnMenuItemClickListener(RoomActivity.this);
+                popup.inflate(R.menu.end_menu);
+                popup.show();
+            }
+        });
 
 
     }
 
     private void clear() {
+        if (!isClosed) {
+            DatabaseReference cl = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isRestart");
+            cl.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (Objects.equals(snapshot.getValue(), "1")) {
+                        if (!isRestart) {
+                            isRestart = true;
+                            AlertDialog.Builder builder = new AlertDialog.Builder(RoomActivity.this);
+                            View view = LayoutInflater.from(RoomActivity.this).inflate(R.layout.remake_diaglog, null);
+                            TextView txtTm = view.findViewById(R.id.txtTimeRestart);
+                            builder.setView(view);
+                            AlertDialog dialog = builder.create();
+                            dialog.setCancelable(false);
+                            dialog.show();
 
-
-        DatabaseReference cl = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isRestart");
-        cl.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (Objects.equals(snapshot.getValue(), "1")) {
-                    if (!isRestart) {
-                        isRestart = true;
-                        AlertDialog.Builder builder = new AlertDialog.Builder(RoomActivity.this);
-                        View view = LayoutInflater.from(RoomActivity.this).inflate(R.layout.remake_diaglog, null);
-                        TextView txtTm = view.findViewById(R.id.txtTimeRestart);
-                        builder.setView(view);
-                        AlertDialog dialog = builder.create();
-                        dialog.setCancelable(false);
-                        dialog.show();
-
-                        ct = new CountDownTimer(11000, 1000) {
-                            @SuppressLint("SetTextI18n")
-                            @Override
-                            public void onTick(long millisUntilFinished) {
-                                txtTm.setText(millisUntilFinished / 1000 + "s");
-                            }
-
-                            @Override
-                            public void onFinish() {
-                                dialog.dismiss();
-                                removeValue();
-                                if (ct != null) {
-                                    ct.cancel();
-                                    ct = null;
+                            ct = new CountDownTimer(11000, 1000) {
+                                @SuppressLint("SetTextI18n")
+                                @Override
+                                public void onTick(long millisUntilFinished) {
+                                    txtTm.setText(millisUntilFinished / 1000 + "s");
                                 }
-                            }
-                        }.start();
+
+                                @Override
+                                public void onFinish() {
+
+                                    if (isKey) {
+                                        DatabaseReference cl = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
+                                        cl.child("isStop").setValue("1").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                if (ct != null) {
+                                                    ct.cancel();
+                                                    ct = null;
+                                                }
+                                                dialog.dismiss();
+                                                removeValue();
+
+                                            }
+                                        });
+                                    } else {
+                                        if (ct != null) {
+                                            ct.cancel();
+                                            ct = null;
+                                        }
+                                        dialog.dismiss();
+                                        removeValue();
+
+                                    }
+                                }
+                            }.start();
+                        }
+
                     }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
                 }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+            });
+        }
 
     }
 
@@ -739,45 +779,22 @@ public class RoomActivity extends AppCompatActivity {
         btnCancel = findViewById(R.id.btnCancel);
         txtCountNumber = findViewById(R.id.txtCountNumber);
         btnSharePin = findViewById(R.id.btnSharePin);
-        txtNameTop1 = findViewById(R.id.txtNameTop1);
-        txtNameTop2 = findViewById(R.id.txtNameTop2);
-        txtNameTop3 = findViewById(R.id.txtNameTop3);
-        txtScore1 = findViewById(R.id.txtScore1);
-        txtScore2 = findViewById(R.id.txtScore2);
-        txtScore3 = findViewById(R.id.txtScore3);
         txtPoint = findViewById(R.id.txtPoint);
         txtRank = findViewById(R.id.txtRank);
         layoutRank = findViewById(R.id.layoutRank);
         benFinish_end = findViewById(R.id.btnFinish_end);
         btnOpen = findViewById(R.id.btnOpen);
         progress_bar = findViewById(R.id.progress_bar);
-        rl1 = findViewById(R.id.rl1);
-        rl2 = findViewById(R.id.rl2);
-        rl3 = findViewById(R.id.rl3);
-
         viewPager = findViewById(R.id.viewpager);
         tablayout = findViewById(R.id.tablayout);
+        mRank = findViewById(R.id.mRank);
 
 
     }
 
     @Override
     public void onBackPressed() {
-
-        if (!isStart){
-            if (postDelay != null) {
-                postDelay.cancel();
-                postDelay = null;
-            }
-            stopCountdown();
-            removeValue();
-        }else {
-            //showdialog hỏi có muốn thoát hay không ^^
-        }
-
-
-
-
+        backdialog();
     }
 
     @Override
@@ -813,6 +830,35 @@ public class RoomActivity extends AppCompatActivity {
 
     }
 
+
+    private void backdialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(RoomActivity.this);
+        builder.setTitle("EXIT");
+        builder.setMessage("Are you sure you want to exit?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                removeValue();
+                if (postDelay != null) {
+                    postDelay.cancel();
+                    postDelay = null;
+                }
+                stopCountdown();
+                removeValue();
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -834,4 +880,13 @@ public class RoomActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        if (item.getItemId() == R.id.end_item) {
+            DatabaseReference dt = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isRestart");
+            dt.setValue("1");
+            return true;
+        }
+        return false;
+    }
 }

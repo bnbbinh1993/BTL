@@ -43,23 +43,13 @@ public class AdapterRoom extends RecyclerView.Adapter<AdapterRoom.VH> {
     public void onBindViewHolder(@NonNull VH holder, int position) {
         Room model = roomList.get(position);
 
-        holder.name.setText("Tên: " + model.getName());
+        holder.name.setText("Name: " + model.getName());
         holder.id.setText("ID: " + model.getId());
 
 
-        String c = "<p>Trạng thái: <b> <font color ='red'>Kết thúc</color></b></p>";
-        String b = "<p>Trạng thái: <b> <font color ='green'>Đang diên ra</color></b></p>";
-        String a = "<p>Trạng thái: <b> <font color ='blue'>Đang chờ</color></b></p>";
-
-
-        if (model.getIsPlay().equals("1") && model.getIsStop().equals("1")) {
-            setTextView(holder, c);
-        } else if (model.getIsPlay().equals("1") && model.getIsStop().equals("0")) {
-            setTextView(holder, b);
-        } else {
-            setTextView(holder, a);
-        }
-
+        String c = "<p>Status: <b> <font color ='red'>finished</color></b></p>";
+        String b = "<p>Status: <b> <font color ='green'>started</color></b></p>";
+        String a = "<p>Status: <b> <font color ='blue'>waiting</color></b></p>";
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,6 +57,17 @@ public class AdapterRoom extends RecyclerView.Adapter<AdapterRoom.VH> {
                 item.click(position);
             }
         });
+
+
+        if (model.getIsStop().equals("1")) {
+            setTextView(holder, c);
+        } else if (model.getIsPlay().equals("1")) {
+            setTextView(holder, b);
+        } else {
+            setTextView(holder, a);
+        }
+
+
 
     }
 

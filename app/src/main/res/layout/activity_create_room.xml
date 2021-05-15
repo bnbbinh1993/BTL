@@ -40,11 +40,15 @@
 
             <EditText
                 android:id="@+id/nameRoom"
+                style="@style/TXT"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@null"
-                android:hint="Test 1"
+                android:hint="Test 1 (max length = 30)"
                 android:imeOptions="actionSearch"
+                android:inputType="textCapSentences"
+                android:maxLength="30"
+                android:maxLines="1"
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 tools:ignore="HardcodedText" />
@@ -65,12 +69,14 @@
 
             <EditText
                 android:id="@+id/passwordRoom"
+                style="@style/TXT"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:hint="***"
                 android:imeOptions="actionSearch"
                 android:inputType="number"
+                android:maxLength="15"
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 tools:ignore="HardcodedText,TextFields" />
@@ -91,12 +97,14 @@
 
             <EditText
                 android:id="@+id/topicId"
+                style="@style/TXT"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:hint="(VD: 1000)"
                 android:imeOptions="actionSearch"
                 android:inputType="number"
+                android:maxLength="20"
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 tools:ignore="HardcodedText" />
@@ -118,6 +126,7 @@
 
             <EditText
                 android:id="@+id/timeTest"
+                style="@style/TXT"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@null"
@@ -132,10 +141,12 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCreate"
+            style="@style/TXT"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="Create"
+            android:textColor="@color/white"
             tools:ignore="HardcodedText" />
     </LinearLayout>
 

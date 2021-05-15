@@ -14,6 +14,7 @@
     <color name="wrong">#FFA59E</color>
     <color name="btnA">#F44336</color>
     <color name="btnB">#3F51B5</color>
-    <color name="btnC">#FFC107</color>d
-    <color name="btnD">#4CAF50</color>d
+    <color name="btnC">#FFC107</color>
+    <color name="btnD">#4CAF50</color>
+    <color name="btnChoose">#FF1100</color>
 </resources>

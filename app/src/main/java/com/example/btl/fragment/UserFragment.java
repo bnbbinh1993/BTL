@@ -57,15 +57,17 @@ public class UserFragment extends Fragment {
     private void initUitls() {
         userList = new ArrayList<>();
         adapterUser = new AdapterUser(userList);
-        adapterUser = new AdapterUser(userList);
         mRecyclerview.setHasFixedSize(true);
         mRecyclerview.setLayoutManager(new GridLayoutManager(getContext(), 6));
         mRecyclerview.setAdapter(adapterUser);
+
+
     }
 
     private void getDataByFirebase() {
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(RoomActivity.id_room).child("user");
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                .child("room").child(RoomActivity.id_room).child("user");
         reference.addValueEventListener(new ValueEventListener() {
             @SuppressLint("SetTextI18n")
             @Override

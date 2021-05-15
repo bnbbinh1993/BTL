@@ -39,9 +39,9 @@ public class AdapterTopic extends RecyclerView.Adapter<AdapterTopic.VH> {
     public void onBindViewHolder(@NonNull VH holder, int position) {
         Topic model = topicList.get(position);
 
-        holder.name.setText("Tên: " + model.getName());
+        holder.name.setText("Name: " + model.getName());
         holder.id.setText("ID: " + model.getId());
-        holder.author.setText("Tác giả: " + model.getAuthor());
+        holder.author.setText("Master: " + model.getAuthor());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

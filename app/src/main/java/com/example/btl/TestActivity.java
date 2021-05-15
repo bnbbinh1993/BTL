@@ -2,6 +2,7 @@ package com.example.btl;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.btl.adapter.AdapterUser;
+import com.example.btl.adapter.RankAdapter;
 import com.example.btl.model.Point;
 import com.example.btl.model.Topic;
 import com.example.btl.model.User;
@@ -52,24 +54,17 @@ public class TestActivity extends AppCompatActivity {
     private CountDownTimer postDelay;
     private int point = 0;
     private int answer = 0;
-    private LinearLayout end_test;
+    private RelativeLayout end_test;
     private RelativeLayout layoutTest;
     private String id_topic = "1000";
-
     private ProgressBar progress_bar;
-    private TextView txtNameTop1;
-    private TextView txtNameTop2;
-    private TextView txtNameTop3;
-    private TextView txtScore1;
-    private TextView txtScore2;
-    private TextView txtScore3;
     private TextView txtPoint;
     private TextView txtRank;
     private LinearLayout layoutRank;
     private List<Point> scoreList;
-    private RelativeLayout rl1;
-    private RelativeLayout rl2;
-    private RelativeLayout rl3;
+    private RecyclerView mRank;
+    private RankAdapter rankAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,6 +145,10 @@ public class TestActivity extends AppCompatActivity {
         layoutRank.setVisibility(View.VISIBLE);
         progress_bar.setVisibility(View.INVISIBLE);
         scoreList = new ArrayList<>();
+        rankAdapter = new RankAdapter(scoreList);
+        mRank.setHasFixedSize(true);
+        mRank.setLayoutManager(new GridLayoutManager(TestActivity.this, 1));
+        mRank.setAdapter(rankAdapter);
         DatabaseReference rank = FirebaseDatabase.getInstance().getReference().child("topic").child(id_topic).child("rank");
         rank.addValueEventListener(new ValueEventListener() {
             @SuppressLint("SetTextI18n")
@@ -161,32 +160,7 @@ public class TestActivity extends AppCompatActivity {
                     scoreList.add(md);
                 }
                 Collections.sort(scoreList);
-
-
-                if (scoreList.size() > 0) {
-                    rl1.setVisibility(View.VISIBLE);
-                    rl2.setVisibility(View.GONE);
-                    rl3.setVisibility(View.GONE);
-                    txtNameTop1.setText(scoreList.get(0).getName());
-                    txtScore1.setText(scoreList.get(0).getScore());
-
-                }
-                if (scoreList.size() > 1) {
-                    rl1.setVisibility(View.VISIBLE);
-                    rl2.setVisibility(View.VISIBLE);
-                    rl3.setVisibility(View.GONE);
-                    txtNameTop2.setText(scoreList.get(1).getName());
-                    txtScore2.setText(scoreList.get(1).getScore());
-
-                }
-                if (scoreList.size() > 2) {
-                    rl1.setVisibility(View.VISIBLE);
-                    rl2.setVisibility(View.VISIBLE);
-                    rl3.setVisibility(View.VISIBLE);
-                    txtNameTop3.setText(scoreList.get(2).getName());
-                    txtScore3.setText(scoreList.get(2).getScore());
-                }
-
+                rankAdapter.notifyDataSetChanged();
                 for (int i = 0; i < scoreList.size(); i++) {
                     if (user.getUid().equals(scoreList.get(i).getUid())) {
                         txtRank.setText("Ranking: " + (i + 1));
@@ -353,31 +327,65 @@ public class TestActivity extends AppCompatActivity {
 
     }
 
+    private void checkChoose(int i) {
+        if (model.getQuestion().get(position).getAnswerTrue() != answer) {
+            switch (answer) {
+                case 1: {
+                    layoutA.setBackgroundResource(R.color.btnChoose);
+                    break;
+                }
+                case 2: {
+                    layoutB.setBackgroundResource(R.color.btnChoose);
+                    break;
+                }
+                case 3: {
+                    layoutC.setBackgroundResource(R.color.btnChoose);
+                    break;
+                }
+                case 4: {
+                    layoutD.setBackgroundResource(R.color.btnChoose);
+                    break;
+                }
+                default: {
+                    // k làm gì ^^
+                }
+
+            }
+        }
+
+    }
+
     @SuppressLint("SetTextI18n")
     private void checkAnwser() {
         if (model.getQuestion().get(position).getAnswerTrue() == answer) {
             point = point + 100;
         }
+
         switch (model.getQuestion().get(position).getAnswerTrue()) {
             case 1: {
                 layoutA.setBackgroundResource(R.color.correct);
                 layoutB.setBackgroundResource(R.color.wrong);
                 layoutC.setBackgroundResource(R.color.wrong);
                 layoutD.setBackgroundResource(R.color.wrong);
+                checkChoose(1);
                 break;
             }
             case 2: {
+
                 layoutA.setBackgroundResource(R.color.wrong);
                 layoutB.setBackgroundResource(R.color.correct);
                 layoutC.setBackgroundResource(R.color.wrong);
                 layoutD.setBackgroundResource(R.color.wrong);
+                checkChoose(2);
                 break;
             }
             case 3: {
+
                 layoutA.setBackgroundResource(R.color.wrong);
                 layoutB.setBackgroundResource(R.color.wrong);
                 layoutC.setBackgroundResource(R.color.correct);
                 layoutD.setBackgroundResource(R.color.wrong);
+                checkChoose(3);
                 break;
             }
             case 4: {
@@ -385,10 +393,11 @@ public class TestActivity extends AppCompatActivity {
                 layoutB.setBackgroundResource(R.color.wrong);
                 layoutC.setBackgroundResource(R.color.wrong);
                 layoutD.setBackgroundResource(R.color.correct);
+                checkChoose(4);
                 break;
             }
         }
-
+        answer = 0;
         position++;
     }
 
@@ -411,19 +420,12 @@ public class TestActivity extends AppCompatActivity {
         layoutTest = findViewById(R.id.layoutTest);
         btnFinish_end = findViewById(R.id.btnFinish_end);
         progress_bar = findViewById(R.id.progress_bar);
-        txtNameTop1 = findViewById(R.id.txtNameTop1);
-        txtNameTop2 = findViewById(R.id.txtNameTop2);
-        txtNameTop3 = findViewById(R.id.txtNameTop3);
-        txtScore1 = findViewById(R.id.txtScore1);
-        txtScore2 = findViewById(R.id.txtScore2);
-        txtScore3 = findViewById(R.id.txtScore3);
         txtPoint = findViewById(R.id.txtPoint);
         txtRank = findViewById(R.id.txtRank);
         layoutRank = findViewById(R.id.layoutRank);
         progress_bar = findViewById(R.id.progress_bar);
-        rl1 = findViewById(R.id.rl1);
-        rl2 = findViewById(R.id.rl2);
-        rl3 = findViewById(R.id.rl3);
+        mRank = findViewById(R.id.mRank);
+
 
     }
 

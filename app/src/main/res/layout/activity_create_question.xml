@@ -44,11 +44,13 @@
 
                 <EditText
                     android:id="@+id/nameZoom"
+                    style="@style/TXT"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@null"
                     android:hint="input here"
                     android:imeOptions="actionSearch"
+                    android:maxLength="30"
                     android:textColor="@color/black"
                     android:textSize="14sp"
                     tools:ignore="HardcodedText" />
@@ -70,11 +72,13 @@
 
                 <EditText
                     android:id="@+id/descriptions"
+                    style="@style/TXT"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@null"
                     android:hint="input here"
                     android:imeOptions="actionSearch"
+                    android:maxLength="50"
                     android:textColor="@color/black"
                     android:textSize="14sp"
                     tools:ignore="HardcodedText" />
@@ -112,17 +116,20 @@
 
                     <EditText
                         android:id="@+id/edtQuestion"
+                        style="@style/TXT"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_6"
                         android:hint="Question..."
                         android:inputType="textCapSentences"
+                        android:maxLength="60"
                         android:padding="5dp"
                         android:textSize="14sp"
                         tools:ignore="HardcodedText" />
 
                     <EditText
                         android:id="@+id/edtTime"
+                        style="@style/TXT"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_6"
@@ -149,11 +156,13 @@
 
                         <EditText
                             android:id="@+id/edtAnswerA"
+                            style="@style/TXT"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@drawable/bg_6"
                             android:hint="answer 1"
                             android:inputType="textCapSentences"
+                            android:maxLength="50"
                             android:textSize="14sp"
                             tools:ignore="HardcodedText" />
 
@@ -176,11 +185,13 @@
 
                         <EditText
                             android:id="@+id/edtAnswerB"
+                            style="@style/TXT"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@drawable/bg_6"
                             android:hint="answer 2"
                             android:inputType="textCapSentences"
+                            android:maxLength="50"
                             android:textSize="14sp"
                             tools:ignore="HardcodedText" />
 
@@ -203,11 +214,13 @@
 
                         <EditText
                             android:id="@+id/edtAnswerC"
+                            style="@style/TXT"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@drawable/bg_6"
                             android:hint="answer 3"
                             android:inputType="textCapSentences"
+                            android:maxLength="50"
                             android:textSize="14sp"
                             tools:ignore="HardcodedText" />
 
@@ -230,11 +243,13 @@
 
                         <EditText
                             android:id="@+id/edtAnswerD"
+                            style="@style/TXT"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@drawable/bg_6"
                             android:hint="answer 3"
                             android:inputType="textCapSentences"
+                            android:maxLength="50"
                             android:textSize="14sp"
                             tools:ignore="HardcodedText" />
 
@@ -249,16 +264,19 @@
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnDone"
+                            style="@style/TXT"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:backgroundTint="@color/app"
                             android:text="Done"
                             android:textAllCaps="false"
+                            android:textColor="@color/white"
                             tools:ignore="HardcodedText" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnNext"
+                            style="@style/TXT"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
@@ -266,6 +284,7 @@
                             android:backgroundTint="@color/app"
                             android:text="Next"
                             android:textAllCaps="false"
+                            android:textColor="@color/white"
                             tools:ignore="HardcodedText" />
                     </LinearLayout>
 

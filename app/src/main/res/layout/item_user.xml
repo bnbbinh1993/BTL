@@ -16,6 +16,8 @@
         android:src="@mipmap/demo" />
 
     <TextView
+        android:singleLine="true"
+        android:ellipsize="end"
         android:maxLines="1"
         android:id="@+id/name"
         style="@style/TXT"
