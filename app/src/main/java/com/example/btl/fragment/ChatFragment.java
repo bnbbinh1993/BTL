@@ -53,7 +53,7 @@ public class ChatFragment extends Fragment {
     public static String UID = "";
     private final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
 
-    public static ChatFragment newInstance(String param1, String param2) {
+    public static ChatFragment newInstance() {
         return new ChatFragment();
     }
 
@@ -89,7 +89,7 @@ public class ChatFragment extends Fragment {
                     chatList.add(model);
                 }
                 chatAdapter.notifyDataSetChanged();
-                mRecyclerview.scrollToPosition(chatList.size()-1);
+                mRecyclerview.scrollToPosition(chatList.size() - 1);
 
             }
 
@@ -118,9 +118,15 @@ public class ChatFragment extends Fragment {
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Chat md = new Chat(account.getDisplayName(), edtChat.getText().toString(), user.getUid());
-                chat.push().setValue(md);
-                edtChat.setText("");
+                if (!RoomActivity.isStart) {
+                    Chat md = new Chat(account.getDisplayName(), edtChat.getText().toString(), user.getUid());
+                    chat.push().setValue(md);
+                    edtChat.setText("");
+                } else {
+                    Toast.makeText(getContext(), "So sorry! Started unable to chat!", Toast.LENGTH_SHORT).show();
+                    edtChat.setText("");
+                }
+
             }
         });
         edtChat.addTextChangedListener(new TextWatcher() {

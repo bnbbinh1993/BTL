@@ -47,9 +47,9 @@ public class AdapterRoom extends RecyclerView.Adapter<AdapterRoom.VH> {
         holder.id.setText("ID: " + model.getId());
 
 
-        String c = "<p>Status: <b> <font color ='red'>finished</color></b></p>";
-        String b = "<p>Status: <b> <font color ='green'>started</color></b></p>";
-        String a = "<p>Status: <b> <font color ='blue'>waiting</color></b></p>";
+        String c = "<b>Status: <font color ='red'>finished</color></b>";
+        String b = "<b>Status: <font color ='green'>started</color></b>";
+        String a = "<b>Status: <font color ='blue'>waiting</color></b>";
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,7 +66,6 @@ public class AdapterRoom extends RecyclerView.Adapter<AdapterRoom.VH> {
         } else {
             setTextView(holder, a);
         }
-
 
 
     }

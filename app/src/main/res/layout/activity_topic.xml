@@ -32,7 +32,7 @@
         android:id="@+id/mRecyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/test_1"
+        android:background="@color/white"
         android:overScrollMode="never"
         android:visibility="gone" />
 </LinearLayout>

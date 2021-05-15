@@ -32,6 +32,7 @@
             android:padding="5dp">
 
             <TextView
+                android:textSize="15sp"
                 style="@style/TXT"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -39,6 +40,7 @@
                 tools:ignore="HardcodedText" />
 
             <EditText
+
                 android:id="@+id/nameRoom"
                 style="@style/TXT"
                 android:layout_width="match_parent"
@@ -50,7 +52,7 @@
                 android:maxLength="30"
                 android:maxLines="1"
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 tools:ignore="HardcodedText" />
         </LinearLayout>
 
@@ -61,6 +63,7 @@
             android:padding="5dp">
 
             <TextView
+                android:textSize="15sp"
                 style="@style/TXT"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -78,7 +81,7 @@
                 android:inputType="number"
                 android:maxLength="15"
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 tools:ignore="HardcodedText,TextFields" />
         </LinearLayout>
 
@@ -89,10 +92,11 @@
             android:padding="5dp">
 
             <TextView
+                android:textSize="15sp"
                 style="@style/TXT"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Subject ID"
+                android:text="Topic ID"
                 tools:ignore="HardcodedText" />
 
             <EditText
@@ -106,7 +110,7 @@
                 android:inputType="number"
                 android:maxLength="20"
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 tools:ignore="HardcodedText" />
         </LinearLayout>
 
@@ -137,6 +141,47 @@
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 tools:ignore="HardcodedText" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="5dp"
+            android:visibility="visible">
+
+            <TextView
+                android:textSize="15sp"
+                style="@style/TXT"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Privacy and safety"
+                tools:ignore="HardcodedText" />
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:gravity="start"
+                android:orientation="horizontal">
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/btnPublic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:checked="true"
+                    android:text="Public"
+                    tools:ignore="HardcodedText" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/btnPrivate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Private"
+                    tools:ignore="HardcodedText" />
+            </RadioGroup>
+
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton

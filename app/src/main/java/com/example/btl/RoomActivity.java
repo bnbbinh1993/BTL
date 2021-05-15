@@ -8,7 +8,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 
@@ -98,6 +100,7 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private boolean isStop = false;
     private boolean isEnd = false;
     private boolean isClosed = false;
+    public static boolean isStart = false;
     private GoogleSignInAccount account;
     private ProgressBar progress_bar;
 
@@ -212,55 +215,63 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
     private void initPlay() {
         if (!isStop) {
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
-            reference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (!isFinish) {
-                        if (Objects.requireNonNull(snapshot.child("isPlay").getValue()).toString().equals("1")) {
-                            if (Objects.requireNonNull(snapshot.child("isStop").getValue()).toString().equals("0")) {
+            if (!isClosed) {
+                try {
+                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
+                    reference.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (!isFinish) {
+                                if (Objects.requireNonNull(snapshot.child("isPlay").getValue()).toString().equals("1")) {
+                                    isStart = true;
+                                    if (Objects.requireNonNull(snapshot.child("isStop").getValue()).toString().equals("0")) {
 
-                                count = new CountDownTimer(4000, 1000) {
-                                    @SuppressLint("SetTextI18n")
-                                    @Override
-                                    public void onTick(long millisUntilFinished) {
-                                        txtRoomName.setText((int) (millisUntilFinished / 1000) + " sec");
-                                        if ((int) (millisUntilFinished / 1000) == 0) {
-                                            txtRoomName.setText("Start");
-                                        }
+                                        count = new CountDownTimer(4000, 1000) {
+                                            @SuppressLint("SetTextI18n")
+                                            @Override
+                                            public void onTick(long millisUntilFinished) {
+                                                txtRoomName.setText((int) (millisUntilFinished / 1000) + " sec");
+                                                if ((int) (millisUntilFinished / 1000) == 0) {
+                                                    txtRoomName.setText("Start");
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onFinish() {
+
+                                                showPlay();
+                                                if (count != null) {
+                                                    count.cancel();
+                                                    count = null;
+                                                }
+
+
+                                            }
+                                        }.start();
+
+                                    } else {
+                                        showStop();
                                     }
-
-                                    @Override
-                                    public void onFinish() {
-
-                                        showPlay();
-                                        if (count != null) {
-                                            count.cancel();
-                                            count = null;
-                                        }
-
-
-                                    }
-                                }.start();
-
-                            } else {
-                                showStop();
+                                } else if (Objects.requireNonNull(snapshot.child("isStop").getValue()).toString().equals("0")) {
+                                    layoutWait.setVisibility(View.VISIBLE);
+                                    end_game.setVisibility(View.GONE);
+                                    layoutPlay.setVisibility(View.GONE);
+                                }
                             }
-                        } else if (Objects.requireNonNull(snapshot.child("isStop").getValue()).toString().equals("0")) {
-                            layoutWait.setVisibility(View.VISIBLE);
-                            end_game.setVisibility(View.GONE);
-                            layoutPlay.setVisibility(View.GONE);
+
                         }
 
-                    }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
 
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+            }
 
-                }
-            });
         }
 
 
@@ -705,9 +716,12 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                             builder.setView(view);
                             AlertDialog dialog = builder.create();
                             dialog.setCancelable(false);
-                            dialog.show();
+                            if (!RoomActivity.this.isFinishing()) {
+                                dialog.show();
+                            }
 
-                            ct = new CountDownTimer(11000, 1000) {
+
+                            ct = new CountDownTimer(5000, 1000) {
                                 @SuppressLint("SetTextI18n")
                                 @Override
                                 public void onTick(long millisUntilFinished) {
@@ -802,8 +816,7 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
     protected void onStop() {
         super.onStop();
-        //removeValue();
-
+        isClosed = true;
     }
 
     private void removeValue() {
@@ -818,6 +831,7 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                     appleSnapshot.getRef().removeValue();
                 }
                 finish();
+
             }
 
             @Override
@@ -883,10 +897,12 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         if (item.getItemId() == R.id.end_item) {
+            isClosed = true;
             DatabaseReference dt = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isRestart");
             dt.setValue("1");
             return true;
         }
         return false;
     }
+
 }

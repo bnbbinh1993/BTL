@@ -22,6 +22,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.radiobutton.MaterialRadioButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -45,6 +46,8 @@ public class CreateRoomActivity extends AppCompatActivity {
     private GoogleSignInAccount account;
     private FirebaseUser user;
     private ProgressDialog progressDialog;
+    private MaterialRadioButton btnPublic, btnPrivate;
+    private int isPrivacy = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,10 +76,11 @@ public class CreateRoomActivity extends AppCompatActivity {
         btnCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressDialog.show();
+
                 create();
             }
         });
+
 
     }
 
@@ -87,9 +91,18 @@ public class CreateRoomActivity extends AppCompatActivity {
         topicId = findViewById(R.id.topicId);
         timeTest = findViewById(R.id.timeTest);
         btnCreate = findViewById(R.id.btnCreate);
+        btnPublic = findViewById(R.id.btnPublic);
+        btnPrivate = findViewById(R.id.btnPrivate);
     }
 
     private void create() {
+        if (btnPublic.isChecked()) {
+            isPrivacy = 0;
+        }
+        if (btnPrivate.isChecked()) {
+            isPrivacy = 1;
+        }
+
         String name = nameRoom.getText().toString().trim();
         String pass = passwordRoom.getText().toString().trim();
         String topic = topicId.getText().toString().trim();
@@ -107,6 +120,7 @@ public class CreateRoomActivity extends AppCompatActivity {
             Toast.makeText(this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
             topicId.requestFocus();
         } else {
+            progressDialog.show();
             DatabaseReference topicRef = FirebaseDatabase.getInstance().getReference().child("topic");
             topicRef.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
                 @Override
@@ -139,6 +153,7 @@ public class CreateRoomActivity extends AppCompatActivity {
                                                         map.put("isCount", "1");
                                                         map.put("isCheck", "0");
                                                         map.put("isStop", "0");
+                                                        map.put("isPrivacy", String.valueOf(isPrivacy));
                                                         map.put("author", account.getDisplayName());
                                                         int key = Integer.parseInt(id) + 1;
                                                         reference.child("room").child(String.valueOf(Integer.parseInt(id) + 1)).setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -183,6 +198,7 @@ public class CreateRoomActivity extends AppCompatActivity {
                                             map.put("isCheck", "0");
                                             map.put("isPlay", "0");
                                             map.put("isStop", "0");
+                                            map.put("isPrivacy", String.valueOf(isPrivacy));
                                             map.put("author", account.getDisplayName());
                                             reference.child("room").child("1000").setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override

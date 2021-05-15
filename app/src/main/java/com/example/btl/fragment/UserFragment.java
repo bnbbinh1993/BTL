@@ -31,7 +31,7 @@ public class UserFragment extends Fragment {
     private AdapterUser adapterUser;
     private List<User> userList;
 
-    public static UserFragment newInstance(String param1, String param2) {
+    public static UserFragment newInstance() {
         return new UserFragment();
     }
 

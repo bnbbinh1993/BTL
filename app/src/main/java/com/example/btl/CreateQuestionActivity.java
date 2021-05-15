@@ -111,65 +111,70 @@ public class CreateQuestionActivity extends AppCompatActivity {
         btnPush.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final ProgressDialog progressDialog = new ProgressDialog(CreateQuestionActivity.this);
-                progressDialog.setTitle("Uploading...Please wait!");
-                progressDialog.show();
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("topic");
-                reference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
-                    @Override
-                    public void onSuccess(DataSnapshot dataSnapshot) {
-                        long id = 1000;
-                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                            id = Long.parseLong(Objects.requireNonNull(ds.child("id").getValue()).toString());
-                        }
-                        id = id + 1;
-                        Map<String, String> map = new HashMap<>();
-                        String name = nameZoom.getText().toString().trim();
-                        String des = descriptions.getText().toString().trim();
-
-                        if (name.isEmpty()) {
-                            Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
-                            nameZoom.requestFocus();
-                            progressDialog.dismiss();
-                        } else if (des.isEmpty()) {
-                            Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
-                            descriptions.requestFocus();
-                            progressDialog.dismiss();
-                        } else {
-                            map.put("name", name);
-                            map.put("descriptions", des);
-                            map.put("id", String.valueOf(id));
-                            if (acct != null) {
-                                map.put("author", acct.getDisplayName());
-                            } else {
-                                map.put("author", "Admin");
+                if (list.size() > 0) {
+                    final ProgressDialog progressDialog = new ProgressDialog(CreateQuestionActivity.this);
+                    progressDialog.setTitle("Uploading...Please wait!");
+                    progressDialog.show();
+                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("topic");
+                    reference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+                        @Override
+                        public void onSuccess(DataSnapshot dataSnapshot) {
+                            long id = 1000;
+                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                id = Long.parseLong(Objects.requireNonNull(ds.child("id").getValue()).toString());
                             }
+                            id = id + 1;
+                            Map<String, String> map = new HashMap<>();
+                            String name = nameZoom.getText().toString().trim();
+                            String des = descriptions.getText().toString().trim();
 
-                            String idzoom = String.valueOf(id);
-                            DatabaseReference data = FirebaseDatabase.getInstance().getReference().child("topic").child(idzoom);
-                            data.setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    DatabaseReference data1 = FirebaseDatabase.getInstance().getReference().child("topic").child(idzoom).child("Question");
-                                    for (int i = 0; i < list.size(); i++) {
-                                        QS a = list.get(i);
-                                        data1.child(String.valueOf(i + 1)).setValue(a);
+                            if (name.isEmpty()) {
+                                Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
+                                nameZoom.requestFocus();
+                                progressDialog.dismiss();
+                            } else if (des.isEmpty()) {
+                                Toast.makeText(CreateQuestionActivity.this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
+                                descriptions.requestFocus();
+                                progressDialog.dismiss();
+                            } else {
+                                map.put("name", name);
+                                map.put("descriptions", des);
+                                map.put("id", String.valueOf(id));
+                                if (acct != null) {
+                                    map.put("author", acct.getDisplayName());
+                                } else {
+                                    map.put("author", "Admin");
+                                }
+
+                                String idzoom = String.valueOf(id);
+                                DatabaseReference data = FirebaseDatabase.getInstance().getReference().child("topic").child(idzoom);
+                                data.setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        DatabaseReference data1 = FirebaseDatabase.getInstance().getReference().child("topic").child(idzoom).child("Question");
+                                        for (int i = 0; i < list.size(); i++) {
+                                            QS a = list.get(i);
+                                            data1.child(String.valueOf(i + 1)).setValue(a);
+                                        }
+
+                                        progressDialog.dismiss();
+                                        finish();
                                     }
-
-                                    progressDialog.dismiss();
-                                    finish();
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(CreateQuestionActivity.this, "onFailure!", Toast.LENGTH_SHORT).show();
-                                    progressDialog.dismiss();
-                                }
-                            });
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(CreateQuestionActivity.this, "onFailure!", Toast.LENGTH_SHORT).show();
+                                        progressDialog.dismiss();
+                                    }
+                                });
+                            }
                         }
-                    }
 
-                });
+                    });
+                } else {
+                    Toast.makeText(CreateQuestionActivity.this, "No question!", Toast.LENGTH_SHORT).show();
+                }
+
 
             }
         });

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -39,6 +40,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -58,6 +60,7 @@ public class JoinActivity extends AppCompatActivity {
     private GoogleSignInAccount account;
     private FirebaseAuth auth;
     private FirebaseUser user;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,7 +198,7 @@ public class JoinActivity extends AppCompatActivity {
                         }
 
                     } else {
-                        Toast.makeText(JoinActivity.this, "Phòng đã đóng bạn không thể tham gia!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(JoinActivity.this, "Phòng đã đóng bạn không thể vào!", Toast.LENGTH_SHORT).show();
                     }
 
                 } else {
@@ -212,9 +215,9 @@ public class JoinActivity extends AppCompatActivity {
     }
 
     private void getDataByFirebase() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room");
-
-        reference.addValueEventListener(new ValueEventListener() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        Query query = reference.child("room").orderByChild("isPrivacy").equalTo("0");
+        query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 roomList.clear();
@@ -259,5 +262,8 @@ public class JoinActivity extends AppCompatActivity {
         super.onResume();
     }
 
-
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
 }
