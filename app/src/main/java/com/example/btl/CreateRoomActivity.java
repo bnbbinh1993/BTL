@@ -120,12 +120,13 @@ public class CreateRoomActivity extends AppCompatActivity {
             Toast.makeText(this, "Cannot to blank!", Toast.LENGTH_SHORT).show();
             topicId.requestFocus();
         } else {
-            progressDialog.show();
+
             DatabaseReference topicRef = FirebaseDatabase.getInstance().getReference().child("topic");
             topicRef.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
                 @Override
                 public void onSuccess(DataSnapshot dataSnapshot) {
                     if (dataSnapshot.hasChild(topic)) {
+                        progressDialog.show();
                         if (account != null) {
                             DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
                             reference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {

@@ -122,7 +122,7 @@
                         android:background="@drawable/bg_6"
                         android:hint="Question..."
                         android:inputType="textCapSentences"
-                        android:maxLength="60"
+                        android:maxLength="150"
                         android:padding="5dp"
                         android:textSize="14sp"
                         tools:ignore="HardcodedText" />

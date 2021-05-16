@@ -121,11 +121,10 @@ public class ChatFragment extends Fragment {
                 if (!RoomActivity.isStart) {
                     Chat md = new Chat(account.getDisplayName(), edtChat.getText().toString(), user.getUid());
                     chat.push().setValue(md);
-                    edtChat.setText("");
                 } else {
                     Toast.makeText(getContext(), "So sorry! Started unable to chat!", Toast.LENGTH_SHORT).show();
-                    edtChat.setText("");
                 }
+                edtChat.setText("");
 
             }
         });
@@ -137,7 +136,7 @@ public class ChatFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() >= 50) {
+                if (s.length() >= 60) {
                     Toast.makeText(getContext(), "Max length = 50", Toast.LENGTH_SHORT).show();
                 }
                 if (s.length() > 0) {

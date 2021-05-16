@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
     private CircleImageView mAvatar;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 txtName.setText(Html.fromHtml(a, Html.FROM_HTML_MODE_LEGACY));
             } else {
-                txtName.setText(Html.fromHtml(a));
+                txtName.setText(Html.fromHtml((a)));
             }
             Glide.with(this)
                     .load(personPhoto)

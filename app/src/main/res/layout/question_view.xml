@@ -97,6 +97,7 @@
 
 
     <TextView
+        android:padding="10dp"        
         android:id="@+id/txtQuestion"
         style="@style/TXT"
         android:layout_width="match_parent"
