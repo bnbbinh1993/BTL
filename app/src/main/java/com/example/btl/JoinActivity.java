@@ -152,6 +152,7 @@ public class JoinActivity extends AppCompatActivity {
                                                             Map<String, String> map = new HashMap<>();
                                                             map.put("uid", user.getUid());
                                                             map.put("name", account.getDisplayName());
+                                                            map.put("url", String.valueOf(account.getPhotoUrl()));
                                                             reference.setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                 @Override
                                                                 public void onComplete(@NonNull Task<Void> task) {

@@ -24,7 +24,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginTop="5dp"
-            android:textAllCaps="true"
             android:textColor="@color/white"
             android:textSize="15sp"
             tools:ignore="HardcodedText" />
@@ -40,8 +39,9 @@
     </LinearLayout>
 
     <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/mAvatar"
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:layout_marginStart="10dp"
-        android:src="@mipmap/demo" />
+      />
 </LinearLayout>

@@ -7,9 +7,9 @@
     android:padding="5dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/mAvatar"
         android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:src="@mipmap/demo" />
+        android:layout_height="35dp" />
 
     <LinearLayout
         android:layout_width="200dp"
@@ -22,8 +22,6 @@
             style="@style/TXT"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bùi Ngọc Bình"
-            android:textAllCaps="true"
             android:textColor="@color/white"
             android:textSize="15sp"
             tools:ignore="HardcodedText" />

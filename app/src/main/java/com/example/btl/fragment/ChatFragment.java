@@ -51,6 +51,7 @@ public class ChatFragment extends Fragment {
     private ChatAdapter chatAdapter;
     private List<Chat> chatList;
     public static String UID = "";
+
     private final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
 
     public static ChatFragment newInstance() {
@@ -106,6 +107,7 @@ public class ChatFragment extends Fragment {
         assert user != null;
         UID = user.getUid();
         account = GoogleSignIn.getLastSignedInAccount(Objects.requireNonNull(getContext()));
+
         chat = FirebaseDatabase.getInstance().getReference().child("room").child(RoomActivity.id_room).child("chat");
 
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
@@ -119,7 +121,7 @@ public class ChatFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (!RoomActivity.isStart) {
-                    Chat md = new Chat(account.getDisplayName(), edtChat.getText().toString(), user.getUid());
+                    Chat md = new Chat(account.getDisplayName(), edtChat.getText().toString(), user.getUid(), String.valueOf(user.getPhotoUrl()));
                     chat.push().setValue(md);
                 } else {
                     Toast.makeText(getContext(), "So sorry! Started unable to chat!", Toast.LENGTH_SHORT).show();

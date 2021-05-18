@@ -31,6 +31,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -59,7 +60,6 @@ public class LoginActivity extends AppCompatActivity {
                 .requestEmail()
                 .build();
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
-
         auth = FirebaseAuth.getInstance();
         ImageButton gg = findViewById(R.id.imageTop);
         gg.setOnClickListener(new View.OnClickListener() {
@@ -98,33 +98,43 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    UpdateData(inAccount);
+                    DatabaseReference checkAccount = FirebaseDatabase.getInstance().getReference().child("User");
+                    checkAccount.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+                        @Override
+                        public void onSuccess(DataSnapshot dataSnapshot) {
+                            FirebaseUser user = auth.getCurrentUser();
+                            if (dataSnapshot.hasChild(Objects.requireNonNull(user).getUid())) {
+                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                finish();
+                            } else {
+                                UpdateData(inAccount);
+                            }
+                        }
+                    });
+
                 }
             }
         });
     }
 
     private void UpdateData(GoogleSignInAccount inAccount) {
-
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Uploading");
         progressDialog.show();
         FirebaseUser user = auth.getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-
         Map<String, String> map = new HashMap<>();
-
         map.put("personName", inAccount.getDisplayName());
         map.put("personGivenName", inAccount.getGivenName());
         map.put("personFamilyName", inAccount.getFamilyName());
         map.put("personEmail", inAccount.getEmail());
         map.put("personId", inAccount.getId());
-
-
+        map.put("personPhoto", String.valueOf(inAccount.getPhotoUrl()));
+        map.put("personPhone", "0");
+        map.put("personFB", "null");
         reference.child("User").child(Objects.requireNonNull(user).getUid()).setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(LoginActivity.this, "onSuccess!", Toast.LENGTH_SHORT).show();
                 progressDialog.setCanceledOnTouchOutside(false);
                 progressDialog.dismiss();
                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
@@ -133,7 +143,6 @@ public class LoginActivity extends AppCompatActivity {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(LoginActivity.this, "onFailure!", Toast.LENGTH_SHORT).show();
                 progressDialog.setCanceledOnTouchOutside(false);
                 progressDialog.dismiss();
             }

@@ -4,11 +4,13 @@ public class Chat {
     private String name;
     private String messenger;
     private String uid;
+    private String url;
 
-    public Chat(String name, String messenger, String uid) {
+    public Chat(String name, String messenger, String uid, String url) {
         this.name = name;
         this.messenger = messenger;
         this.uid = uid;
+        this.url = url;
     }
 
     public Chat() {
@@ -36,5 +38,13 @@ public class Chat {
 
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

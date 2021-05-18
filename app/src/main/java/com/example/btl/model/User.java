@@ -3,6 +3,16 @@ package com.example.btl.model;
 public class User {
     private String uid;
     private String name;
+    private String url;
+
+    public User(String uid, String name, String url) {
+        this.uid = uid;
+        this.name = name;
+        this.url = url;
+    }
+
+    public User() {
+    }
 
     public String getUid() {
         return uid;
@@ -20,12 +30,11 @@ public class User {
         this.name = name;
     }
 
-    public User() {
+    public String getUrl() {
+        return url;
     }
 
-
-    public User(String uid, String name) {
-        this.uid = uid;
-        this.name = name;
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

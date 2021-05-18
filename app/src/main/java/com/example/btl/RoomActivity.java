@@ -118,6 +118,7 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     public static String pass_room = "";
     public static String id_room = "";
     public static String uid = "";
+    public static String UID_KEY = "";
 
 
     @Override
@@ -616,6 +617,8 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                     btnPlay.setVisibility(View.GONE);
                     btnMenu.setVisibility(View.GONE);
                 }
+
+                UID_KEY = Objects.requireNonNull(dataSnapshot.child("uid").getValue()).toString();
                 btnOpen.setVisibility(View.GONE);
                 txtRoomName.setText(Objects.requireNonNull(dataSnapshot.child("name").getValue()).toString());
             }

@@ -26,4 +26,7 @@
         <item name="textAllCaps">false</item>
         <item name="android:fontFamily">@font/averia_sans_libre_light</item>
     </style>
+
+    <style name="AppTheme" parent="android:Theme.Light" />
+
 </resources>
