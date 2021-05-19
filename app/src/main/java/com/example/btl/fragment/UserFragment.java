@@ -1,6 +1,7 @@
 package com.example.btl.fragment;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.btl.JoinActivity;
@@ -107,12 +109,54 @@ public class UserFragment extends Fragment {
                                     .centerCrop()
                                     .into(mAvatar);
                         }
+
+                    });
+
+                    txtN.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            copy(getContext(), txtN.getText().toString());
+                        }
+                    });
+                    txtFB.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            copy(getContext(), txtFB.getText().toString());
+                        }
+                    });
+                    txtEmail.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            copy(getContext(), txtEmail.getText().toString());
+                        }
+                    });
+                    txtSDT.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            copy(getContext(), txtSDT.getText().toString());
+                        }
                     });
                 }
 
             }
         });
     }
+
+    @SuppressLint("ObsoleteSdkInt")
+    private void copy(Context context, String text) {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.setText(text);
+
+        } else {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
+            clipboard.setPrimaryClip(clip);
+
+        }
+        Toast.makeText(context, "Copy successful!", Toast.LENGTH_SHORT).show();
+    }
+
 
     private void getDataByFirebase() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
