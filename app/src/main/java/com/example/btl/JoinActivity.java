@@ -140,7 +140,7 @@ public class JoinActivity extends AppCompatActivity {
                                     @Override
                                     public void onClick(View v) {
                                         if (ip.getText().toString().trim().isEmpty()) {
-                                            Toast.makeText(JoinActivity.this, "Vui lòng nhập password!", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(JoinActivity.this, "Please enter a password!", Toast.LENGTH_SHORT).show();
                                             ip.requestFocus();
                                         } else {
                                             if (ip.getText().toString().trim().equals(dataSnapshot.child(key).child("password").getValue())) {
@@ -183,33 +183,26 @@ public class JoinActivity extends AppCompatActivity {
                                                 ip.requestFocus();
                                                 dialog.dismiss();
                                             }
-
                                         }
                                     }
                                 });
-
-
                             } else {
-
-
-                                Toast.makeText(JoinActivity.this, "Không có password", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(JoinActivity.this, "No password", Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            Toast.makeText(JoinActivity.this, "Phòng đã bắt đầu bạn không thể tham gia!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(JoinActivity.this, "Room has started, you can't join!", Toast.LENGTH_SHORT).show();
                         }
-
                     } else {
-                        Toast.makeText(JoinActivity.this, "Phòng đã đóng bạn không thể vào!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(JoinActivity.this, "The room is closed, you cannot enter!", Toast.LENGTH_SHORT).show();
                     }
-
                 } else {
-                    Toast.makeText(JoinActivity.this, "Không có phòng trên", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(JoinActivity.this, "Room does not exist!", Toast.LENGTH_SHORT).show();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(JoinActivity.this, "Không có phòng trên", Toast.LENGTH_SHORT).show();
+                Toast.makeText(JoinActivity.this, "Room does not exist!", Toast.LENGTH_SHORT).show();
             }
         });
 
