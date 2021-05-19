@@ -15,6 +15,7 @@ import com.example.btl.R;
 import com.example.btl.RoomActivity;
 import com.example.btl.fragment.ChatFragment;
 import com.example.btl.model.Chat;
+import com.example.btl.utils.ClickItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +24,16 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.VH> {
     private List<Chat> chatList = new ArrayList<>();
+    private ClickItem clickItem;
 
 
     public ChatAdapter(List<Chat> chats) {
         this.chatList = chats;
 
+    }
+
+    public void setOnClickItem(ClickItem onClickItem1) {
+        clickItem = onClickItem1;
     }
 
     @NonNull
@@ -46,10 +52,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.VH> {
         Chat model = chatList.get(position);
         String mess = model.getMessenger();
         String url = model.getUrl();
-        String m = model.getName();
-        StringBuilder name = new StringBuilder(m);
+        String name = model.getName();
+        String m = "<font color='yellow'>★</font>";
         if (RoomActivity.UID_KEY.equals(model.getUid())) {
-            name.append("<font color='red'>" + "(c)" + "</font>");
+            if (!model.getUid().equals(ChatFragment.UID)) {
+                name = m + name;
+            }
         }
 
         String c = "<b> <font color ='#4AAFFF'>" + mess + "</color></b>";
@@ -68,6 +76,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.VH> {
                 .centerCrop()
                 .error(R.mipmap.demo)
                 .into(holder.mAvatar);
+        holder.mAvatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickItem.click(position);
+            }
+        });
 
 
     }

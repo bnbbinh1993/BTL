@@ -21,8 +21,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:ellipsize="end"
-        android:maxLines="1"
         android:singleLine="true"
+        android:maxLines="1"
         android:textColor="@color/white"
         android:textSize="12sp"
         tools:ignore="HardcodedText" />

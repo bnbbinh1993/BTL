@@ -588,7 +588,7 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     @SuppressLint("SetTextI18n")
     private void initUtils() {
         Pef.getReference(RoomActivity.this);
-        Pef.setFullScreen(RoomActivity.this);
+        Pef.setFullScreen();
         layoutWait.setVisibility(View.VISIBLE);
         id_room = getIntent().getStringExtra("id_room");
         pass_room = getIntent().getStringExtra("pass_room");

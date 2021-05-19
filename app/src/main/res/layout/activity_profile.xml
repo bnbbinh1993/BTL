@@ -18,22 +18,30 @@
             android:scaleType="centerCrop"
             android:src="@mipmap/background" />
 
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_margin="5dp"
-            android:background="@drawable/bg_8"
-            android:src="@drawable/ic_back" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="35dp">
 
-        <ImageButton
-            android:id="@+id/btnMenu"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
-            android:layout_margin="5dp"
-            android:background="@drawable/bg_8"
-            android:src="@drawable/ic_menu" />
+            <ImageButton
+
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/bg_8"
+                android:src="@drawable/ic_back" />
+
+            <ImageButton
+
+                android:id="@+id/btnMenu"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="5dp"
+                android:background="@drawable/bg_8"
+                android:src="@drawable/ic_menu" />
+        </RelativeLayout>
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/mAvatar"
@@ -43,7 +51,6 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:scaleType="centerCrop"
-            android:src="@mipmap/demo"
             app:civ_border_color="@color/app"
             app:civ_border_width="1dp" />
     </RelativeLayout>
@@ -98,6 +105,8 @@
             android:src="@drawable/ic_facebook" />
 
         <EditText
+            android:ellipsize="end"
+            android:singleLine="true"
             android:id="@+id/txtFB"
             style="@style/TXT"
             android:layout_width="match_parent"
@@ -129,6 +138,8 @@
             android:src="@drawable/ic_phone" />
 
         <EditText
+            android:ellipsize="end"
+            android:singleLine="true"
             android:id="@+id/txtPhone"
             style="@style/TXT"
             android:layout_width="match_parent"
@@ -136,11 +147,12 @@
             android:background="@drawable/bg_6"
             android:focusable="false"
             android:focusableInTouchMode="false"
+            android:inputType="number"
             android:padding="10dp"
             android:text="093198722"
             android:textColor="@color/black"
             android:textStyle="bold"
-            tools:ignore="HardcodedText" />
+            tools:ignore="HardcodedText,TextFields" />
     </LinearLayout>
 
     <LinearLayout
@@ -159,6 +171,8 @@
             android:src="@drawable/ic_gmail" />
 
         <EditText
+            android:ellipsize="end"
+            android:singleLine="true"
             android:id="@+id/txtGmail"
             style="@style/TXT"
             android:layout_width="match_parent"
@@ -189,7 +203,7 @@
         android:layout_gravity="center"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
-        android:background="?attr/actionBarItemBackground"
+        android:background="?attr/selectableItemBackground"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 

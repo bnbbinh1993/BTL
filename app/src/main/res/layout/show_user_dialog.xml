@@ -13,7 +13,6 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_gravity="center"
-        android:src="@mipmap/demo"
         app:civ_border_color="@color/white"
         app:civ_border_width="0.5dp" />
 
@@ -67,12 +66,14 @@
             android:src="@drawable/ic_facebook" />
 
         <TextView
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:maxLines="1"
             android:id="@+id/txtFB"
             style="@style/TXT"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
-
             android:textColor="@color/black"
             android:textStyle="bold"
             tools:ignore="HardcodedText" />
@@ -94,12 +95,14 @@
             android:src="@drawable/ic_phone" />
 
         <TextView
+            android:ellipsize="end"
+            android:singleLine="true"
             android:id="@+id/txtSDT"
             style="@style/TXT"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
-
+            android:maxLines="1"
             android:textColor="@color/black"
             android:textStyle="bold"
             tools:ignore="HardcodedText" />
@@ -121,6 +124,9 @@
             android:src="@drawable/ic_gmail" />
 
         <TextView
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:maxLines="1"
             android:id="@+id/txtEmail"
             style="@style/TXT"
             android:layout_width="match_parent"

@@ -37,16 +37,16 @@ public class Pef {
     private static final String listYear[] = new String[200];
 
     @SuppressLint("StaticFieldLeak")
-    private static Context context;
+    private static Activity activity;
     private static String result;
     private static SharedPreferences preferences;
 
-    public static void getReference(Context c) {
-        context = c;
+    public static void getReference(Activity c) {
+        activity = c;
     }
 
     public static void setLong(String name, long gt) {
-        preferences = context.getSharedPreferences("HIHI", MODE_PRIVATE);
+        preferences = activity.getSharedPreferences("HIHI", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putLong(name, gt);
         editor.apply();
@@ -54,12 +54,12 @@ public class Pef {
     }
 
     public static long getLong(String name) {
-        preferences = context.getSharedPreferences("HIHI", MODE_PRIVATE);
+        preferences = activity.getSharedPreferences("HIHI", MODE_PRIVATE);
         return preferences.getLong(name, 0);
     }
 
     public static void setInt(String name, int gt) {
-        preferences = context.getSharedPreferences("HIHI", MODE_PRIVATE);
+        preferences = activity.getSharedPreferences("HIHI", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt(name, gt);
         editor.apply();
@@ -67,24 +67,24 @@ public class Pef {
     }
 
     public static int getInt(String name) {
-        preferences = context.getSharedPreferences("HIHI", MODE_PRIVATE);
+        preferences = activity.getSharedPreferences("HIHI", MODE_PRIVATE);
         return preferences.getInt(name, 0);
     }
 
     public static void setString(String name, String gt) {
-        preferences = context.getSharedPreferences("HIHI", MODE_PRIVATE);
+        preferences = activity.getSharedPreferences("HIHI", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(name, gt);
         editor.apply();
     }
 
     public static String getString(String name, String er) {
-        preferences = context.getSharedPreferences("HIHI", MODE_PRIVATE);
+        preferences = activity.getSharedPreferences("HIHI", MODE_PRIVATE);
         return preferences.getString(name, er);
     }
 
     public static void setBoolean(String name, boolean gt) {
-        preferences = context.getSharedPreferences("HIHI", MODE_PRIVATE);
+        preferences = activity.getSharedPreferences("HIHI", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean(name, gt);
         editor.apply();
@@ -92,12 +92,12 @@ public class Pef {
     }
 
     public static boolean getBoolean(String name) {
-        preferences = context.getSharedPreferences("HIHI", MODE_PRIVATE);
+        preferences = activity.getSharedPreferences("HIHI", MODE_PRIVATE);
         return preferences.getBoolean(name, false);
     }
 
     public static void showMessenger(String content) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("Hí anh em");
         builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -187,7 +187,7 @@ public class Pef {
     }
 
     @SuppressLint("ObsoleteSdkInt")
-    public static void setFullScreen(Activity activity) {
+    public static void setFullScreen() {
         if (Build.VERSION.SDK_INT >= 19 && Build.VERSION.SDK_INT < 21) {
             setWindowFlag(activity, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, true);
         }
