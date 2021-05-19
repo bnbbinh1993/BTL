@@ -199,8 +199,8 @@ public class ProfileActivity extends AppCompatActivity {
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
-                        finish();
                         overridePendingTransition(R.anim.bottom_out, R.anim.bottom_in);
+                        finish();
                     }
                 });
     }
@@ -217,7 +217,8 @@ public class ProfileActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+
         overridePendingTransition(R.anim.out_left, R.anim.in_left);
+        finish();
     }
 }
