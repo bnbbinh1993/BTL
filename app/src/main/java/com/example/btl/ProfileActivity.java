@@ -217,7 +217,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-
         overridePendingTransition(R.anim.out_left, R.anim.in_left);
         finish();
     }
