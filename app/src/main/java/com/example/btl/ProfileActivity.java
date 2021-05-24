@@ -114,8 +114,9 @@ public class ProfileActivity extends AppCompatActivity {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
                 overridePendingTransition(R.anim.out_left, R.anim.in_left);
+                finish();
+
             }
         });
         txtN.setOnClickListener(new View.OnClickListener() {

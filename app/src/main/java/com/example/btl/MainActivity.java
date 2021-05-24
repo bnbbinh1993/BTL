@@ -53,12 +53,10 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private GoogleSignInClient mGoogleSignInClient;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         initGG();
         init();
         getPersonByGG();
@@ -83,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
     private void init() {
         btnTopic = findViewById(R.id.btnTopic);
         btnRoom = findViewById(R.id.btnRoom);
@@ -92,10 +89,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     @SuppressLint("SetTextI18n")
     private void getPersonByGG() {
-
         acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         if (acct != null) {
             String personName = acct.getDisplayName();
@@ -119,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-
     }
 
     private void initGG() {
@@ -130,7 +124,6 @@ public class MainActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
-
 
     }
 

@@ -215,7 +215,7 @@ public class ChatFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() >= 60) {
-                    Toast.makeText(getContext(), "Max length = 50", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Max length = 60", Toast.LENGTH_SHORT).show();
                 }
                 if (s.length() > 0) {
                     btnSend.setVisibility(View.VISIBLE);
