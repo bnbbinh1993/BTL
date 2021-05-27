@@ -133,7 +133,7 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         view_wait_game.setVisibility(View.GONE);
         view_end_game.setVisibility(View.VISIBLE);
         if (isKey) {
-            benFinish_end.setText("END (Finish)");
+            benFinish_end.setText("END");
         }
     }
 
