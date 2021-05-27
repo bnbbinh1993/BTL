@@ -10,6 +10,7 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +19,9 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.example.btl.adapter.AdapterQuestion;
+import com.example.btl.data.DBHelper;
+import com.example.btl.data.QsControler;
+import com.example.btl.data.QsMd;
 import com.example.btl.model.QS;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -26,11 +30,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +45,7 @@ public class CreateQuestionActivity extends AppCompatActivity {
     private MaterialButton btnDone;
     private MaterialButton btnNext;
     private MaterialButton btnPush;
+    private MaterialButton btnPushData;
     private MaterialCardView cardQuestion;
     private RecyclerView mRecyclerview;
     private AdapterQuestion adapterQuestion;
@@ -61,6 +65,8 @@ public class CreateQuestionActivity extends AppCompatActivity {
     private int AnswerTrue = 1;
     private GoogleSignInAccount acct;
     private ProgressDialog progressDialog;
+    private List<QsMd> listDT;
+    private List<QsMd> md = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -225,6 +231,81 @@ public class CreateQuestionActivity extends AppCompatActivity {
             }
         });
 
+
+    }
+
+    private void data() {
+        DBHelper dbHelper = new DBHelper(getApplicationContext());
+        QsControler model = new QsControler(getApplicationContext());
+        listDT = new ArrayList<>();
+
+        try {
+            dbHelper.openDataBase();
+            dbHelper.createDataBase();
+            listDT = model.getTrangBiDBS();
+            Log.d("TAG", "initAction: " + listDT.size());
+            dbHelper.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        btnPushData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                final ProgressDialog progressDialog = new ProgressDialog(CreateQuestionActivity.this);
+                progressDialog.setTitle("Uploading...Please wait!");
+                progressDialog.show();
+                for (int i = 1; i < 53; i++) {
+                    md.add(listDT.get(i));
+                }
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("topic");
+                reference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+                    @Override
+                    public void onSuccess(DataSnapshot dataSnapshot) {
+                        long id = 1000;
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                            id = Long.parseLong(Objects.requireNonNull(ds.child("id").getValue()).toString());
+                        }
+                        id = id + 1;
+                        Map<String, String> map = new HashMap<>();
+                        String name = "Mạng máy tính";
+                        String des = "Mạng máy tính";
+
+                        map.put("name", name);
+                        map.put("descriptions", des);
+                        map.put("id", String.valueOf(id));
+                        if (acct != null) {
+                            map.put("author", acct.getDisplayName());
+                        } else {
+                            map.put("author", "Admin");
+                        }
+
+                        String idzoom = String.valueOf(id);
+                        DatabaseReference data = FirebaseDatabase.getInstance().getReference().child("topic").child(idzoom);
+                        data.setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                DatabaseReference data1 = FirebaseDatabase.getInstance().getReference().child("topic").child(idzoom).child("Question");
+                                for (int i = 0; i < md.size(); i++) {
+                                    QS a = new QS(md.get(i).getField1(), md.get(i).getField2(), md.get(i).getField3(), md.get(i).getField4(), md.get(i).getField5(), Integer.parseInt(md.get(i).getField6()), "15");
+                                    data1.child(String.valueOf(i + 1)).setValue(a);
+                                }
+                                progressDialog.dismiss();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                progressDialog.dismiss();
+                                Toast.makeText(CreateQuestionActivity.this, "onFailure!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                });
+            }
+        });
     }
 
     private void radiobuttonClick() {
@@ -291,6 +372,7 @@ public class CreateQuestionActivity extends AppCompatActivity {
         btnD = findViewById(R.id.btnD);
         answerD = findViewById(R.id.edtAnswerD);
         edtTime = findViewById(R.id.edtTime);
+        btnPushData = findViewById(R.id.btnPushData);
 
 
     }

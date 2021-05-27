@@ -7,10 +7,10 @@
     android:orientation="vertical"
     tools:context=".RoomActivity">
 
-    <include layout="@layout/room_view" />
+    <include layout="@layout/view_wait_game" />
 
-    <include layout="@layout/question_view" />
+    <include layout="@layout/view_play_game" />
 
-    <include layout="@layout/end_game_question" />
+    <include layout="@layout/vieiw_end_game" />
 
 </LinearLayout>

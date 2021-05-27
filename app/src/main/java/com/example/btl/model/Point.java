@@ -4,11 +4,13 @@ public class Point implements Comparable<Point> {
     private String uid;
     private String name;
     private String score;
+    private String url;
 
-    public Point(String uid, String name, String score) {
+    public Point(String uid, String name, String score, String url) {
         this.uid = uid;
         this.name = name;
         this.score = score;
+        this.url = url;
     }
 
     public Point() {
@@ -38,6 +40,13 @@ public class Point implements Comparable<Point> {
         this.score = score;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
     @Override
     public int compareTo(Point o) {

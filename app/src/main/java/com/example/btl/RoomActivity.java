@@ -66,12 +66,11 @@ import java.util.Objects;
 public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
     private List<User> userList;
-    private List<Point> scoreList;
+
     private FirebaseUser user;
-    private RelativeLayout end_game;
-    private LinearLayout layoutRank;
-    private RelativeLayout layoutPlay;
-    private RelativeLayout layoutWait;
+    private LinearLayout view_end_game;
+    private RelativeLayout view_play_game;
+    private RelativeLayout view_wait_game;
     private CountDownTimer count;
     private CountDownTimer downTimer;
     private CountDownTimer postDelay;
@@ -79,12 +78,10 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private TextView txtRoomName;
     private TextView txtCountNumber;
     private TextView txtPoint;
-    private TextView txtRank;
     private ImageButton btnMenu;
     private ImageButton btnCancel;
-    private MaterialButton btnNext;
     private MaterialButton benFinish_end;
-    private MaterialButton btnOpen;
+    private MaterialButton btnRanking;
     private MaterialButton btnPlay;
     private MaterialButton btnSharePin;
     private Topic model = new Topic();
@@ -98,23 +95,14 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private boolean isKey = false;
     private boolean isRestart = false;
     private boolean isStop = false;
-    private boolean isEnd = false;
     private boolean isClosed = false;
     public static boolean isStart = false;
     private GoogleSignInAccount account;
-    private ProgressBar progress_bar;
-
     private DatabaseReference mPoint;
     private TextView txtQuestion, txtAnswerA, txtAnswerB, txtAnswerC, txtAnswerD, txtTotal, txtTime;
     private LinearLayout layoutA, layoutB, layoutC, layoutD;
-
     private ViewPager viewPager;
     private TabLayout tablayout;
-
-    private RecyclerView mRank;
-    private RankAdapter rankAdapter;
-
-
     public static String pass_room = "";
     public static String id_room = "";
     public static String uid = "";
@@ -129,9 +117,8 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         init();
         initUtils();
         getDataByFirebase();
-        initPlay();
+        initGame();
         isClick();
-        isStop();
         isCheckPlayer();
         clear();
 
@@ -139,43 +126,11 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     }
 
 
-    private void isRank() {
-        layoutRank.setVisibility(View.VISIBLE);
-        progress_bar.setVisibility(View.INVISIBLE);
-        scoreList = new ArrayList<>();
-        rankAdapter = new RankAdapter(scoreList);
-        mRank.setHasFixedSize(true);
-        mRank.setLayoutManager(new GridLayoutManager(RoomActivity.this, 1));
-        mRank.setAdapter(rankAdapter);
-
-        DatabaseReference rank = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("coin");
-        rank.addValueEventListener(new ValueEventListener() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                scoreList.clear();
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    Point md = ds.getValue(Point.class);
-                    scoreList.add(md);
-                }
-                Collections.sort(scoreList);
-                rankAdapter.notifyDataSetChanged();
-
-                for (int i = 0; i < scoreList.size(); i++) {
-                    if (user.getUid().equals(scoreList.get(i).getUid())) {
-                        txtRank.setText("Ranking: " + (i + 1));
-                        return;
-                    }
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
+    private void initEnd() {
+        isStop = true;
+        view_play_game.setVisibility(View.GONE);
+        view_wait_game.setVisibility(View.GONE);
+        view_end_game.setVisibility(View.VISIBLE);
     }
 
     private void isCheckPlayer() {
@@ -196,83 +151,54 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         });
     }
 
-    private void isStop() {
-        DatabaseReference stop = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
-        stop.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (Objects.equals(snapshot.child("isStop").getValue(), "1")) {
-                    isStop = true;
-                    isRank();
-                }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    private void initPlay() {
+    private void initGame() {
         if (!isStop) {
             if (!isClosed) {
-                try {
-                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
-                    reference.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if (!isFinish) {
-                                if (Objects.requireNonNull(snapshot.child("isPlay").getValue()).toString().equals("1")) {
-                                    isStart = true;
-                                    if (Objects.requireNonNull(snapshot.child("isStop").getValue()).toString().equals("0")) {
-
-                                        count = new CountDownTimer(4000, 1000) {
-                                            @SuppressLint("SetTextI18n")
-                                            @Override
-                                            public void onTick(long millisUntilFinished) {
-                                                txtRoomName.setText((int) (millisUntilFinished / 1000) + " sec");
-                                                if ((int) (millisUntilFinished / 1000) == 0) {
-                                                    txtRoomName.setText("Start");
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onFinish() {
-
-                                                showPlay();
-                                                if (count != null) {
-                                                    count.cancel();
-                                                    count = null;
-                                                }
-
-
-                                            }
-                                        }.start();
-
-                                    } else {
-                                        showStop();
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
+                reference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (!isFinish) {
+                            if (Objects.requireNonNull(snapshot.child("isPlay").getValue()).toString().equals("1")) {
+                                isStart = true;
+                                count = new CountDownTimer(4000, 1000) {
+                                    @SuppressLint("SetTextI18n")
+                                    @Override
+                                    public void onTick(long millisUntilFinished) {
+                                        txtRoomName.setText((int) (millisUntilFinished / 1000) + " sec");
+                                        if ((int) (millisUntilFinished / 1000) == 0) {
+                                            txtRoomName.setText("Start");
+                                        }
                                     }
-                                } else if (Objects.requireNonNull(snapshot.child("isStop").getValue()).toString().equals("0")) {
-                                    layoutWait.setVisibility(View.VISIBLE);
-                                    end_game.setVisibility(View.GONE);
-                                    layoutPlay.setVisibility(View.GONE);
-                                }
+
+                                    @Override
+                                    public void onFinish() {
+
+                                        showGame();
+                                        if (count != null) {
+                                            count.cancel();
+                                            count = null;
+                                        }
+                                    }
+                                }.start();
+
+                            } else if (Objects.requireNonNull(snapshot.child("isStop").getValue()).toString().equals("0")) {
+                                view_wait_game.setVisibility(View.VISIBLE);
+                                view_end_game.setVisibility(View.GONE);
+                                view_play_game.setVisibility(View.GONE);
                             }
-
                         }
+                    }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
 
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
+                    }
+                });
             }
-
+        } else {
+            showStop();
         }
 
 
@@ -287,19 +213,16 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
 
     private void showStop() {
-        layoutPlay.setVisibility(View.GONE);
-        layoutWait.setVisibility(View.GONE);
-        end_game.setVisibility(View.VISIBLE);
-
         stopCountdown();
         cancelTimer();
+        initEnd();
 
     }
 
-    private void showPlay() {
-        layoutPlay.setVisibility(View.VISIBLE);
-        layoutWait.setVisibility(View.GONE);
-        end_game.setVisibility(View.GONE);
+    private void showGame() {
+        view_play_game.setVisibility(View.VISIBLE);
+        view_wait_game.setVisibility(View.GONE);
+        view_end_game.setVisibility(View.GONE);
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
         reference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
@@ -324,26 +247,29 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private void updateUI() {
         if (position > size) {
             showStop();
-            if (!isKey) {
-                DatabaseReference check = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isCheck");
-                check.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DataSnapshot> task) {
-                        int p = Integer.parseInt(Objects.requireNonNull(Objects.requireNonNull(task.getResult()).getValue()).toString());
-                        p++;
-                        if (!isEnd) {
-                            isEnd = true;
-                            check.setValue(String.valueOf(p));
-                        }
-                    }
-                });
-            }
+//            if (!isKey) {
+//                DatabaseReference check = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isCheck");
+//                check.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+//                        int p = Integer.parseInt(Objects.requireNonNull(Objects.requireNonNull(task.getResult()).getValue()).toString());
+//                        p++;
+//                        if (!isEnd) {
+//                            isEnd = true;
+//                            check.setValue(String.valueOf(p));
+//                        }
+//                    }
+//                });
+//            }
+
             txtPoint.setText("Total score: " + point);
             pt.setName(account.getDisplayName());
             pt.setUid(user.getUid());
             pt.setScore(String.valueOf(point));
+            pt.setUrl(String.valueOf(user.getPhotoUrl()));
             mPoint.setValue(pt);
             isFinish = true;
+
         } else {
             txtTotal.setText(position + "/" + size);
             txtQuestion.setText(model.getQuestion().get(position).getTxtQuestion());
@@ -589,7 +515,7 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private void initUtils() {
         Pef.getReference(RoomActivity.this);
         Pef.setFullScreen();
-        layoutWait.setVisibility(View.VISIBLE);
+        view_wait_game.setVisibility(View.VISIBLE);
         id_room = getIntent().getStringExtra("id_room");
         pass_room = getIntent().getStringExtra("pass_room");
         PageAdapter adapter = new PageAdapter(getSupportFragmentManager());
@@ -619,7 +545,6 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 }
 
                 UID_KEY = Objects.requireNonNull(dataSnapshot.child("uid").getValue()).toString();
-                btnOpen.setVisibility(View.GONE);
                 txtRoomName.setText(Objects.requireNonNull(dataSnapshot.child("name").getValue()).toString());
             }
         });
@@ -672,7 +597,10 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             @Override
             public void onClick(View v) {
                 isClosed = true;
-                removeValue();
+                isStart = false;
+                isStop = true;
+                finish();
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
@@ -683,11 +611,13 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             }
         });
 
-        btnOpen.setOnClickListener(new View.OnClickListener() {
+        btnRanking.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseReference dt = FirebaseDatabase.getInstance().getReference().child("room").child(id_room).child("isRestart");
-                dt.setValue("1");
+                Intent intent = new Intent(RoomActivity.this, RankActivity.class);
+                intent.putExtra("POINT", point);
+                startActivity(intent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
             }
         });
@@ -775,8 +705,8 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
     private void init() {
 
-        btnNext = findViewById(R.id.btnNext);
-        layoutPlay = findViewById(R.id.layoutPlay);
+
+        view_play_game = findViewById(R.id.layoutPlay);
         txtQuestion = findViewById(R.id.txtQuestion);
         txtAnswerA = findViewById(R.id.txtAnswerA);
         txtAnswerB = findViewById(R.id.txtAnswerB);
@@ -788,23 +718,19 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         layoutB = findViewById(R.id.layoutB);
         layoutC = findViewById(R.id.layoutC);
         layoutD = findViewById(R.id.layoutD);
-        end_game = findViewById(R.id.end_game);
+        view_end_game = findViewById(R.id.end_game);
         txtRoomName = findViewById(R.id.txtRoomName);
-        layoutWait = findViewById(R.id.layoutWait);
+        view_wait_game = findViewById(R.id.layoutWait);
         btnPlay = findViewById(R.id.btnPlay);
         btnMenu = findViewById(R.id.btnMenu);
         btnCancel = findViewById(R.id.btnCancel);
         txtCountNumber = findViewById(R.id.txtCountNumber);
         btnSharePin = findViewById(R.id.btnSharePin);
         txtPoint = findViewById(R.id.txtPoint);
-        txtRank = findViewById(R.id.txtRank);
-        layoutRank = findViewById(R.id.layoutRank);
+        btnRanking = findViewById(R.id.btnRanking);
         benFinish_end = findViewById(R.id.btnFinish_end);
-        btnOpen = findViewById(R.id.btnOpen);
-        progress_bar = findViewById(R.id.progress_bar);
         viewPager = findViewById(R.id.viewpager);
         tablayout = findViewById(R.id.tablayout);
-        mRank = findViewById(R.id.mRank);
 
 
     }

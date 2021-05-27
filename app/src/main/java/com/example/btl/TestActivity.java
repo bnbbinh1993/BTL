@@ -1,15 +1,18 @@
 package com.example.btl;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -17,11 +20,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.btl.adapter.AdapterUser;
 import com.example.btl.adapter.RankAdapter;
+import com.example.btl.adapter.RankTestAdapter;
 import com.example.btl.model.Point;
+import com.example.btl.model.Profile;
 import com.example.btl.model.Topic;
 import com.example.btl.model.User;
+import com.example.btl.utils.ClickItem;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -38,6 +45,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class TestActivity extends AppCompatActivity {
     private FirebaseAuth auth;
@@ -63,7 +72,7 @@ public class TestActivity extends AppCompatActivity {
     private LinearLayout layoutRank;
     private List<Point> scoreList;
     private RecyclerView mRank;
-    private RankAdapter rankAdapter;
+    private RankTestAdapter rankAdapter;
 
 
     @Override
@@ -124,7 +133,7 @@ public class TestActivity extends AppCompatActivity {
                 }
                 if (position > size) {
                     DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("topic").child(id_topic).child("rank");
-                    Point map = new Point(user.getUid(), user.getDisplayName(), String.valueOf(point));
+                    Point map = new Point(user.getUid(), user.getDisplayName(), String.valueOf(point), String.valueOf(user.getPhotoUrl()));
                     reference.child(user.getUid()).setValue(map);
                     txtPoint.setText("Score: " + point);
                     btnNext.setVisibility(View.GONE);
@@ -145,10 +154,18 @@ public class TestActivity extends AppCompatActivity {
         layoutRank.setVisibility(View.VISIBLE);
         progress_bar.setVisibility(View.INVISIBLE);
         scoreList = new ArrayList<>();
-        rankAdapter = new RankAdapter(scoreList);
+        rankAdapter = new RankTestAdapter(scoreList);
         mRank.setHasFixedSize(true);
         mRank.setLayoutManager(new GridLayoutManager(TestActivity.this, 1));
         mRank.setAdapter(rankAdapter);
+
+        rankAdapter.setOnClickItem(new ClickItem() {
+            @Override
+            public void click(int position) {
+                viewInfor((position));
+            }
+        });
+
         DatabaseReference rank = FirebaseDatabase.getInstance().getReference().child("topic").child(id_topic).child("rank");
         rank.addValueEventListener(new ValueEventListener() {
             @SuppressLint("SetTextI18n")
@@ -175,6 +192,82 @@ public class TestActivity extends AppCompatActivity {
 
             }
         });
+
+    }
+
+    @SuppressLint("ObsoleteSdkInt")
+    private void copy(Context context, String text) {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.setText(text);
+
+        } else {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
+            clipboard.setPrimaryClip(clip);
+
+        }
+        Toast.makeText(context, "Copy successful!", Toast.LENGTH_SHORT).show();
+    }
+
+
+    private void viewInfor(int position) {
+
+        if (!scoreList.get(position).getUid().equals(user.getUid())) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(TestActivity.this);
+            View view = LayoutInflater.from(TestActivity.this).inflate(R.layout.show_user_dialog, null);
+            TextView txtN = view.findViewById(R.id.txtN);
+            TextView txtFB = view.findViewById(R.id.txtFB);
+            TextView txtEmail = view.findViewById(R.id.txtEmail);
+            TextView txtSDT = view.findViewById(R.id.txtSDT);
+            CircleImageView mAvatar = view.findViewById(R.id.mAvatar);
+            builder.setView(view);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("User").child(scoreList.get(position).getUid());
+            reference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+                @Override
+                public void onSuccess(DataSnapshot dataSnapshot) {
+                    Profile md = dataSnapshot.getValue(Profile.class);
+                    assert md != null;
+                    txtN.setText(md.getPersonName());
+                    txtFB.setText(md.getPersonFB());
+                    txtEmail.setText(md.getPersonEmail());
+                    txtSDT.setText(md.getPersonPhone());
+                    Glide.with(TestActivity.this)
+                            .load(md.getPersonPhoto())
+                            .centerCrop()
+                            .into(mAvatar);
+                }
+
+            });
+
+            txtN.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    copy(TestActivity.this, txtN.getText().toString());
+                }
+            });
+            txtFB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    copy(TestActivity.this, txtFB.getText().toString());
+                }
+            });
+            txtEmail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    copy(TestActivity.this, txtEmail.getText().toString());
+                }
+            });
+            txtSDT.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    copy(TestActivity.this, txtSDT.getText().toString());
+                }
+            });
+        }
 
     }
 
