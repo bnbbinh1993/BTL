@@ -126,11 +126,15 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     }
 
 
+    @SuppressLint("SetTextI18n")
     private void initEnd() {
         isStop = true;
         view_play_game.setVisibility(View.GONE);
         view_wait_game.setVisibility(View.GONE);
         view_end_game.setVisibility(View.VISIBLE);
+        if (isKey) {
+            benFinish_end.setText("END (Finish)");
+        }
     }
 
     private void isCheckPlayer() {
@@ -596,11 +600,17 @@ public class RoomActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         benFinish_end.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (isKey) {
+                    DatabaseReference isStop = FirebaseDatabase.getInstance().getReference().child("room").child(id_room);
+                    isStop.child("isStop").setValue("1");
+                }
                 isClosed = true;
                 isStart = false;
                 isStop = true;
                 finish();
                 overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+
             }
         });
 
